@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>zmCompiler</title>
+    <!-- Bootstrap -->
+    <link href="bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+    <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">zmCompiler</a>
+    </div>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="https://www.github.com">GitHub</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+    
+  <body>
+    <div class="container">
+      <div class="row-fluid">
+        <div class="col-md-4">
+              <label for="Code">Enter code here:</label>
+              <textarea id="input" placeholder="Enter code here" rows="20" cols="60" class="form-control"></textarea>
+              <p></p>
+              <button id="compile" type="button" class="btn btn-lg btn-success">Compile</button>
+        </div>
+      
+        <div class="col-md-4">
+            <label for="Tokens">Token Stream:</label>
+            <textarea class="form-control" rows="20" id="Tokens"></textarea>
+        </div>
+        <div class="col-md-4">
+            <label for="Parse">Parse Output:</label>
+            <textarea class="form-control" rows="20" id="Parse"></textarea>
+        </div>
+      </div>
+    </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <!-- Include all compiled plugins -->
+    <script src="bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
+    <!-- line numbers for input textarea -->
+    <script src="jquery-linedtextarea.js"></script>
+    <link href="jquery-linedtextarea.css" type="text/css" rel="stylesheet" />
+
+    <!-- Compiler dependencies -->
+    <script src="middleware.js"></script>
+    <script src="Lexer.js"></script>
+    <script src="Parser.js"></script>
+    <script src="Token.js"></script>
+    <script src="Error.js"></script>
+
+  </body>
+</html>
