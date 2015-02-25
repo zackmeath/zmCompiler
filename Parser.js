@@ -2,7 +2,7 @@ function Parser() {
 
 };
 Parser.parse = function(tokens) {
-	console.log(JSON.stringify(tokens));
+	//console.log(JSON.stringify(tokens));
 	Parser.tokenNum = 0;
 	Parser.tokens = tokens;
 	parseBlock();
@@ -17,7 +17,7 @@ function currentToken(){
 }
 function nextToken(){
 	if (Parser.tokenNum < Parser.tokens.length - 1){
-		return Parse.tokens[Parser.tokenNum + 1];
+		return Parser.tokens[Parser.tokenNum + 1];
 	} else {
 		return null;
 	}
@@ -31,7 +31,7 @@ function parseBlock(){
 		inc();
 		parseStatementList();
 	} else {
-		//looking for leftbrace
+		//expecting leftbrace
 	}
 }
 
@@ -60,7 +60,7 @@ function parseStatement(){
 	} else if (token == "LeftBrace"){
 		parseBlock();
 	} else {
-		//ERROR
+		//ERROR expecting statement
 	}
 }
 function parsePrint(){
@@ -72,13 +72,13 @@ function parsePrint(){
 			if (currentToken().type == "RightParen"){
 				inc();
 			} else {
-				//Error looking for rightparen
+				//expecting rightparen
 			}
 		} else {
-			//Error looking for leftparen
+			//expecting leftparen
 		}
 	} else {
-		//Error, looking for print
+		//expecting print
 	}
 }
 function parseAssignment(){
@@ -88,10 +88,10 @@ function parseAssignment(){
 			inc();
 			parseExpr();
 		} else {
-			//Error looking for assignment
+			//expecting assignment
 		}
 	} else {
-		//Error looking for identifier
+		//expecting identifier
 	}
 }
 function parseVarDecl(){
@@ -100,40 +100,106 @@ function parseVarDecl(){
 		if (currentToken().type == "Identifier"){
 			inc();
 		} else {
-			//looking for identifier
+			//expecting identifier
 		}
 	} else {
-		//Error looking for variable type
+		//expecting variable type
 	}
 }
 function parseWhile(){
-	
+	if (currentToken().type == "While"){
+		inc();
+		parseBooleanExpr();
+		parseBlock();
+	} else {
+		// expecting a while
+	}
 }
 function parseIf(){
-	
+	if (currentToken().type == "If"){
+		inc();
+		parseBooleanExpr();
+		parseBlock();
+	} else {
+		//expecting an if statement
+	}
 } 
 function parseExpr(){
-	
+	var tok = currentToken().type;
+	if (tok == "Digit"){
+		parseIntExpr();
+	} else if (tok == "Quote"){
+		parseStringExpr();
+	} else if (tok == "LeftParen" || tok == "Bool") {
+		parseBooleanExpr();
+	} else if (tok == "Identifier"){
+		inc();
+	} else {
+		//error not an expression
+	}
 }
 function parseBooleanExpr(){
-	
+	if (currentToken().type == "LeftParen"){
+		inc();
+		parseExpr();
+		parseBoolOp();
+		parseExpr();
+		if (currentToken().type == "RightParen"){
+			inc();
+		} else {
+			//expecting closing paren
+		}
+	} else if (currentToken().type == "Bool"){
+		inc();
+	} else {
+		//expecting boolexpr
+	}
 }
 function parseIntExpr(){
-	
+	if (currentToken().type == "Digit"){
+		inc();
+		if (currentToken().type == "Addition"){
+			parseIntOp();
+			parseExpr();
+		}
+	} else {
+		//expecting digit
+	}
 }
 function parseStringExpr(){
+	if (currentToken().type == "Quote"){
+		inc();
+		parseCharList();
+		if (currentToken.type == "Quote"){
+			inc();
+		} else {
+			//expecting closing quote
+		}
+	} else {
+		//expecting Quote for string
+	}
 	
 }
 function parseIntOp(){
-	
+	if (currentToken().type == "Addition"){
+		inc();
+	} else {
+		//expecting plus sign
+	}
 }
 function parseCharList(){
-	
-}
-function parseBoolVal(){
-	
+	var tok = currentToken().type;
+	if (tok == "Char" || tok == "Space"){
+		inc();
+		parseCharList();
+	}
 }
 function parseBoolOp(){
-	
+	var tok = currentToken().type;
+	if (tok == "Comparison" || tok == "NotComparison"){
+		inc();
+	} else {
+		//expecting boolean operation
+	}
 }
 
