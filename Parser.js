@@ -27,15 +27,22 @@ function inc(){
 }
 
 function parseBlock(){
-	// {
-	parseStatementList();
-	// }
+	if (currentToken().type == "LeftBrace"){
+		inc();
+		parseStatementList();
+	} else {
+		//looking for leftbrace
+	}
 }
 
 function parseStatementList(){
 	//might be empty if we find }
-	parseStatement();
-	parseStatementList();
+	if (nextToken().type = "RightBrace"){
+		inc();
+	} else {
+		parseStatement();
+		parseStatementList();
+	}
 }
 
 function parseStatement(){
@@ -88,7 +95,16 @@ function parseAssignment(){
 	}
 }
 function parseVarDecl(){
-	
+	if (currentToken().type == "VarType"){
+		inc();
+		if (currentToken().type == "Identifier"){
+			inc();
+		} else {
+			//looking for identifier
+		}
+	} else {
+		//Error looking for variable type
+	}
 }
 function parseWhile(){
 	
@@ -97,6 +113,27 @@ function parseIf(){
 	
 } 
 function parseExpr(){
+	
+}
+function parseBooleanExpr(){
+	
+}
+function parseIntExpr(){
+	
+}
+function parseStringExpr(){
+	
+}
+function parseIntOp(){
+	
+}
+function parseCharList(){
+	
+}
+function parseBoolVal(){
+	
+}
+function parseBoolOp(){
 	
 }
 
