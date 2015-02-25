@@ -18,7 +18,7 @@ Lexer.lex = function(input) {
 			} else {
 				var tokenData = Lexer.getNextToken(line, lineNumber);
 			}
-			console.log(JSON.stringify(tokenData));
+			//console.log(JSON.stringify(tokenData));
 			if (tokenData.error){
 				var err = Error.generate("Lex", "invalid token", line[0], lineNumber, charNum);
 				Error.lexErrors.push(err);
@@ -94,7 +94,7 @@ Lexer.getNextStringToken = function(line){
 };
 
 Lexer.stringifyTokens = function(tokenList) {
-	var out = "";
+	var out = "Lex was seccuessful!\nList of tokens found:\n";
 	for (token in tokenList) {
 		var data = tokenList[token]
 		out += token + ": " + data.type + ", " + data.value + "\n";
