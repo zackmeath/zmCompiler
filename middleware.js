@@ -2,6 +2,11 @@ var compile = document.getElementById("compile");
 var input = $("#input");
 var parseOut = $("#Parse");
 var tokenOut = $("#Tokens");
+var verb = $("#verbose");
+
+function cbToggle(event){
+	Logger.verbose = !Logger.verbose;
+}
 
 $(document).ready(function() {
 	//input.linedtextarea();
@@ -15,11 +20,17 @@ $(document).ready(function() {
 function compileCode() {
 	Error.lexErrors = [];
 	Error.parseErrors = [];
+	parseOut.val("");
+	tokenOut.val("");
+
 	var tokens = Lexer.lex(input.val().trim());
 	if(Error.lexErrors.length > 0) {
-		tokenOut.val(Error.stringifyErrors(Error.lexErrors));
+		tokenOut.val(tokenOut.val() + "\n" + Error.stringifyErrors(Error.lexErrors));
 	} else {
-		tokenOut.val(Lexer.stringifyTokens(tokens));
+		if (tokenOut.val().length > 3){
+			tokenOut.val(tokenOut.val() + "\n");
+		}
+		tokenOut.val(tokenOut.val() + Lexer.stringifyTokens(tokens));
 		var cst = Parser.parse(tokens);
 	}
 }

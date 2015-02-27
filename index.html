@@ -23,7 +23,7 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li><a href="https://github.com/zackmeath/zmCompilera">GitHub</a></li>
+        <li><a href="https://github.com/zackmeath/zmCompiler">GitHub</a></li>
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
@@ -36,7 +36,18 @@
               <label for="Code">Enter code here:</label>
               <textarea id="input" placeholder="Enter code here" rows="20" cols="60" class="form-control"></textarea>
               <p></p>
-              <button id="compile" type="button" class="btn btn-lg btn-success">Compile</button>
+              <div class="row">
+                <div class="col-md-4">
+                  <button id="compile" type="button" class="btn btn-lg btn-success">Compile</button>
+                </div>
+              <div class="col-md-8">
+                <div class="checkbox" id="verbose" ontoggle="cbToggle()" onclick="cbToggle()">
+                  <label>
+                    <input type="checkbox"> Verbose
+                  </label>
+                </div>
+              </div>
+            </div>
         </div>
       
         <div class="col-md-4">
@@ -63,6 +74,7 @@
     <script src="Parser.js"></script>
     <script src="Token.js"></script>
     <script src="Error.js"></script>
+    <script src="Logger.js"></script>
 
   </body>
 </html>

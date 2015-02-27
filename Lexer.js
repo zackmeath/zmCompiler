@@ -2,6 +2,7 @@ function Lexer() {
 
 };
 Lexer.lex = function(input) {
+	Logger.lex("Starting lex...");
 	var stringMode = false;
 	var output = [];
 	//break it up by lines
@@ -94,7 +95,7 @@ Lexer.getNextStringToken = function(line){
 };
 
 Lexer.stringifyTokens = function(tokenList) {
-	var out = "Lex was seccuessful!\nList of tokens found:\n";
+	var out = "Lex was successful!\nList of tokens found:\n";
 	for (token in tokenList) {
 		var data = tokenList[token]
 		out += token + ": " + data.type + ", " + data.value + "\n";
