@@ -23,6 +23,7 @@ Lexer.lex = function(input) {
 			if (tokenData.error){
 				var err = Error.generate("Lex", "invalid token", line[0], lineNumber, charNum);
 				Error.lexErrors.push(err);
+				Logger.lex("ERROR: found invalid token: " + line[0]);
 				charNum++;
 				line = line.substring(1);
 				if (!stringMode){
@@ -30,8 +31,14 @@ Lexer.lex = function(input) {
 				}
 			} else {
 				if (tokenData.value == "\""){
+					if (stringMode){
+						Logger.lex("Exiting string mode");
+					} else {
+						Logger.lex("Entering string mode")
+					}
 					stringMode = !stringMode;
 				};
+				Logger.lex("Token match: " + tokenData.value + " is a " + tokenData.tokenType)
 				var tokenObj = Token.generate(lineNumber, charNum, tokenData.tokenType, tokenData.value);
 				output.push(tokenObj);
 				//console.log(JSON.stringify(tokenObj));
@@ -58,8 +65,6 @@ Lexer.getNextToken = function(line){
 		};
 	};
 	if (max == "" && maxType == undefined){
-		//ENTER LEX ERROR HERE (no match)
-		
 		return {error: true, offset: 1};
 	} else {
 		var tok = {
@@ -98,7 +103,7 @@ Lexer.stringifyTokens = function(tokenList) {
 	var out = "Lex was successful!\nList of tokens found:\n";
 	for (token in tokenList) {
 		var data = tokenList[token]
-		out += token + ": " + data.type + ", " + data.value + "\n";
+		out += "\t" + token + ": " + data.type + ", " + data.value + "\n";
 	};
 	return out;
 };

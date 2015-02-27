@@ -9,7 +9,8 @@ Parser.parse = function(tokens) {
 	if (currentToken().type == "EoF"){
 		//End of file found
 	} else {
-		//End of file not found
+		Logger.parse("");
+		Error.generate("Parse", "desc", )
 	}
 }
 function currentToken(){

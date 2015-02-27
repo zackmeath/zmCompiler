@@ -25,7 +25,10 @@ function compileCode() {
 
 	var tokens = Lexer.lex(input.val().trim());
 	if(Error.lexErrors.length > 0) {
-		tokenOut.val(tokenOut.val() + "\n" + Error.stringifyErrors(Error.lexErrors));
+		if (tokenOut.val().length > 3){
+			tokenOut.val(tokenOut.val() + "\n");
+		}
+		tokenOut.val(tokenOut.val() + Error.stringifyLexErrors(Error.lexErrors));
 	} else {
 		if (tokenOut.val().length > 3){
 			tokenOut.val(tokenOut.val() + "\n");
