@@ -28,12 +28,18 @@ function compileCode() {
 		if (tokenOut.val().length > 3){
 			tokenOut.val(tokenOut.val() + "\n");
 		}
-		tokenOut.val(tokenOut.val() + Error.stringifyLexErrors(Error.lexErrors));
+		tokenOut.val(tokenOut.val() + Error.stringifyErrors("lex"));
 	} else {
 		if (tokenOut.val().length > 3){
 			tokenOut.val(tokenOut.val() + "\n");
 		}
 		tokenOut.val(tokenOut.val() + Lexer.stringifyTokens(tokens));
-		var cst = Parser.parse(tokens);
+		Parser.parse(tokens);
+		if (Error.parseErrors.length === 0){
+			//parse success!!!
+			parseOut.val(parseOut.val() + "Parse Successful!");
+		} else {
+			parseOut.val(parseOut.val() + Error.stringifyErrors("parse"));
+		}
 	}
 }

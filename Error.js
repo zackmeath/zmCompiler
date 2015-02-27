@@ -12,28 +12,31 @@ Error.generateLex = function(type, desc, variable, lineNum, charNum){
 	Error.lexErrors.push(err);
 };
 Error.generateParse = function(found, expecting){
-	var err {
+	var err = {
 		type: "Parse",
 		found: found,
 		expecting: expecting
 	};
-	Error.parseErrors.push(err)
+	Error.parseErrors.push(err);
+	Logger.parse("Parse Error! found: " + found + ", expecting: " + expecting);
 }
 Error.stringifyLex = function(error){
 	var errString = error.type + " error found, line: " + error.lineNumber + ", ";
 	errString += error.description + " \"" + error.variable + "\"";
 	return errString;
 };
-Error.stringifyLexErrors = function(module){
+Error.stringifyErrors = function(module){
+	var errors;
+	var fn;
 	if(module === "lex") { 
-		var errors = Error.lexErrors;
-		var fn = Error.stringifyLex;
+		errors = Error.lexErrors;
+		fn = Error.stringifyLex;
 	} else if (module === "parse"){
-		var errors = Error,parseErrors;
-		var fn = Error.stringifyParse
+		errors = Error.parseErrors;
+		fn = Error.stringifyParse
 	} else {
-		var errors = Error.lexErrors;
-		var fn = Error.stringifyLex;
+		errors = Error.lexErrors;
+		fn = Error.stringifyLex;
 	}
 	var output = "";
 	for (error in errors) {
@@ -42,7 +45,7 @@ Error.stringifyLexErrors = function(module){
 	return output;
 };
 Error.stringifyParse = function(error){
-	return errString = "Parse error: expecting: " + error.expecting  + " but found: " + error.found;
+	return errString = "Parse error! Found: " + error.found  + ", expected: " + error.expecting;
 };
 
 Error.lexErrors = [];

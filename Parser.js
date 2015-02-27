@@ -2,131 +2,156 @@ function Parser() {
 
 };
 Parser.parse = function(tokens) {
-	//console.log(JSON.stringify(tokens));
+	Logger.parse("Starting parse...");
 	Parser.tokenNum = 0;
 	Parser.tokens = tokens;
 	parseBlock();
-	if (currentToken().type === "EoF"){
-		//End of file found
+	if (currentToken() && currentToken() === "EoF"){
+		//parse success!!!
+		consumeToken();
+	} else if (Error.parseErrors.length === 0){
+		Logger.parseWarning("Warning: No EoF(\'$\'') token found, inserted automatically");
+		Parser.tokens.push(Token.generate(0, 0, 'EoF', '$'));
 	} else {
-		Logger.parse("");
-		Error.generate(f,e);
+
 	}
-}
+} 
 function currentToken(){
-	return Parser.tokens[Parser.tokenNum];
-}
-function nextToken(){
-	if (Parser.tokenNum < Parser.tokens.length - 1){
-		return Parser.tokens[Parser.tokenNum + 1];
-	} else {
-		return null;
+	if (Parser.tokenNum >= (Parser.tokens.length)){
+		return "\'End of input\'";
 	}
+	return Parser.tokens[Parser.tokenNum].type;
 }
-function inc(){
+function consumeToken(){
+	Logger.parse("\tFound Terminal " + (Parser.tokenNum + 1) + ": " + Parser.tokens[Parser.tokenNum].type);
+	console.log(JSON.stringify(Parser.tokens));
 	Parser.tokenNum++;
 }
 
 function parseBlock(){
-	if (currentToken().type === "LeftBrace"){
-		inc();
+	Logger.parse("Parsing Block");
+	if (currentToken() === "LeftBrace"){
+		consumeToken();
 		parseStatementList();
 	} else {
-		//expecting leftbrace
+		Error.generateParse(currentToken(), "LeftBrace");
 	}
 }
 
 function parseStatementList(){
-	//might be empty if we find }
-	if (nextToken().type = "RightBrace"){
-		inc();
+	Logger.parse("Parsing statement list");
+	if (currentToken() === "RightBrace"){
+		consumeToken();
 	} else {
-		parseStatement();
-		parseStatementList();
+		if(parseStatement()){
+			parseStatementList();
+		}
 	}
 }
 
 function parseStatement(){
-	var token = currentToken().type;
+	Logger.parse("Parsing statement");
+	var token = currentToken();
 	if (token === "Print"){
+		Logger.parse("Print statement found, going to print...");
 		parsePrint();
+		return true;
 	} else if (token === "Identifier"){
+		Logger.parse("Identifier found, going to assignment...");
 		parseAssignment();
+		return true;
 	} else if (token === "VarType"){
+		Logger.parse("VarType found, going to VarDecl...");
 		parseVarDecl();
+		return true;
 	} else if (token === "While"){
+		Logger.parse("While found, going to while...");
 		parseWhile();
+		return true;
 	} else if (token === "If") {
+		Logger.parse("If statement found, going to if...");
 		parseIf();
+		return true;
 	} else if (token === "LeftBrace"){
+		Logger.parse("\'{\' found, going to new block...");
 		parseBlock();
+		return true;
 	} else {
-		//ERROR expecting statement
+		Error.generateParse(currentToken(), "Statement or \'}\'");
+		return false;
 	}
 }
 function parsePrint(){
-	if (currentToken().type === "Print"){
-		inc();
-		if (currentToken().type === "LeftParen"){
-			inc();
+	Logger.parse("Parsing print");
+	if (currentToken() === "Print"){
+		consumeToken();
+		if (currentToken() === "LeftParen"){
+			consumeToken();
 			parseExpr();
-			if (currentToken().type === "RightParen"){
-				inc();
+			if (currentToken() === "RightParen"){
+				consumeToken();
 			} else {
-				//expecting rightparen
+				Error.generateParse(currentToken(), "\')\'");
 			}
 		} else {
-			//expecting leftparen
+			Error.generateParse(currentToken(), "\'(\'");
 		}
 	} else {
-		//expecting print
+		Error.generateParse(currentToken(), "\'print\' statement");
 	}
 }
 function parseAssignment(){
-	if (currentToken().type === "Identifier"){
-		inc();
-		if (currentToken().type === "Assignment"){
-			inc();
+	Logger.parse("Parsing Assignment");
+	if (currentToken() === "Identifier"){
+		consumeToken();
+		if (currentToken() === "Assignment"){
+			consumeToken();
 			parseExpr();
 		} else {
-			//expecting assignment
+			Error.generateParse(currentToken(), "\'=\'");
 		}
 	} else {
-		//expecting identifier
+		Error.generateParse(currentToken(), "Identifier");
 	}
 }
 function parseVarDecl(){
-	if (currentToken().type === "VarType"){
-		inc();
-		if (currentToken().type === "Identifier"){
-			inc();
+	Logger.parse("Parsing VarDecl");
+	console.log(currentToken());
+	if (currentToken() === "VarType"){
+		consumeToken();
+		console.log(currentToken());
+		if (currentToken() === "Identifier"){
+			consumeToken();
 		} else {
-			//expecting identifier
+			Error.generateParse(currentToken(), "Identifier");
 		}
 	} else {
-		//expecting variable type
+		Error.generateParse(currentToken(), "VarType");
 	}
 }
 function parseWhile(){
-	if (currentToken().type === "While"){
-		inc();
+	Logger.parse("Parsing while");
+	if (currentToken() === "While"){
+		consumeToken();
 		parseBooleanExpr();
 		parseBlock();
 	} else {
-		// expecting a while
+		Error.generateParse(currentToken(), "\'while\' statement");
 	}
 }
 function parseIf(){
-	if (currentToken().type === "If"){
-		inc();
+	Logger.parse("Parsing if");
+	if (currentToken() === "If"){
+		consumeToken();
 		parseBooleanExpr();
 		parseBlock();
 	} else {
-		//expecting an if statement
+		Error.generateParse(currentToken(), "\'if\' statement");
 	}
 } 
 function parseExpr(){
-	var tok = currentToken().type;
+	Logger.parse("Parsing expr");
+	var tok = currentToken();
 	if (tok === "Digit"){
 		parseIntExpr();
 	} else if (tok === "Quote"){
@@ -134,73 +159,85 @@ function parseExpr(){
 	} else if (tok === "LeftParen" || tok === "Bool") {
 		parseBooleanExpr();
 	} else if (tok === "Identifier"){
-		inc();
+		consumeToken();
 	} else {
-		//error not an expression
+		Error.generateParse(currentToken(), "Expression");
 	}
 }
 function parseBooleanExpr(){
-	if (currentToken().type === "LeftParen"){
-		inc();
+	Logger.parse("Parsing BooleanExpr");
+	if (currentToken() === "LeftParen"){
+		consumeToken();
 		parseExpr();
 		parseBoolOp();
 		parseExpr();
-		if (currentToken().type === "RightParen"){
-			inc();
+		if (currentToken() === "RightParen"){
+			consumeToken();
 		} else {
-			//expecting closing paren
+			Error.generateParse(currentToken(), "\')\'");
 		}
-	} else if (currentToken().type === "Bool"){
-		inc();
+	} else if (currentToken() === "Bool"){
+		consumeToken();
 	} else {
-		//expecting boolexpr
+		Error.generateParse(currentToken(), "Boolean Expression");
 	}
 }
 function parseIntExpr(){
-	if (currentToken().type === "Digit"){
-		inc();
-		if (currentToken().type === "Addition"){
+	Logger.parse("Parsing IntExpr");
+	if (currentToken() === "Digit"){
+		consumeToken();
+		if (currentToken() === "Addition"){
 			parseIntOp();
 			parseExpr();
+		} else{
+			Error.generateParse(currentToken(), "\'+\'");
 		}
 	} else {
-		//expecting digit
+		Error.generateParse(currentToken(), "digit");
 	}
 }
 function parseStringExpr(){
-	if (currentToken().type === "Quote"){
-		inc();
+	Logger.parse("Parsing stringExpr");
+	if (currentToken() === "Quote"){
+		consumeToken();
 		parseCharList();
-		if (currentToken.type === "Quote"){
-			inc();
+		if (currentToken() === "Quote"){
+			consumeToken();
 		} else {
-			//expecting closing quote
+			Error.generateParse(currentToken(), "\"");
 		}
 	} else {
-		//expecting Quote for string
+		Error.generateParse(currentToken(), "\"");
 	}
 	
 }
 function parseIntOp(){
-	if (currentToken().type === "Addition"){
-		inc();
+	Logger.parse("Parsing intOp");
+	if (currentToken() === "Addition"){
+		consumeToken();
 	} else {
-		//expecting plus sign
+		Error.generateParse(currentToken(), "\'+\'");
 	}
 }
 function parseCharList(){
-	var tok = currentToken().type;
+	Logger.parse("Parsing charList");
+	var tok = currentToken();
 	if (tok === "Char" || tok === "Space"){
-		inc();
+		consumeToken();
 		parseCharList();
+	} else if (tok === "Quote"){
+		//go back up recursive stack
+	} else {
+		Error.generateParse(currentToken(), "end quote (\"), char, or space");
 	}
 }
 function parseBoolOp(){
-	var tok = currentToken().type;
+	Logger.parse("Parsing boolOp");
+	var tok = currentToken();
 	if (tok === "Comparison" || tok === "NotComparison"){
-		inc();
+		consumeToken();
 	} else {
-		//expecting boolean operation
+		Error.generateParse(currentToken(), "\'==\' or \'!=\'");
 	}
 }
 

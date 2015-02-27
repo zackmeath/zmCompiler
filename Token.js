@@ -94,26 +94,3 @@ Token.types = {
 		pattern: /^[0-9]/,
 	}
 };
-
-
-// keywords:
-// 	{
-// 	}
-// 	(
-// 	)
-// 	$
-// 	print
-// 	while
-// 	if
-// 	" "
-// 	int | string | boolean
-// 	false | true
-// 	==
-// 	!=
-// 	+
-// 	=
-
-// patterns:
-// 	id = "^[a-z]$"
-// 	digit = "^[1-9]$"
-
