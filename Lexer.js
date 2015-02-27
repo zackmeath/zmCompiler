@@ -21,8 +21,7 @@ Lexer.lex = function(input) {
 			}
 			//console.log(JSON.stringify(tokenData));
 			if (tokenData.error){
-				var err = Error.generate("Lex", "invalid token", line[0], lineNumber, charNum);
-				Error.lexErrors.push(err);
+				Error.generateLex("Lex", "invalid token", line[0], lineNumber, charNum);
 				Logger.lex("ERROR: found invalid token: " + line[0]);
 				charNum++;
 				line = line.substring(1);
@@ -30,7 +29,7 @@ Lexer.lex = function(input) {
 					line = line.trim();
 				}
 			} else {
-				if (tokenData.value == "\""){
+				if (tokenData.value === "\""){
 					if (stringMode){
 						Logger.lex("Exiting string mode");
 					} else {
@@ -64,7 +63,7 @@ Lexer.getNextToken = function(line){
 			maxType = type;
 		};
 	};
-	if (max == "" && maxType == undefined){
+	if (max === "" && maxType === undefined){
 		return {error: true, offset: 1};
 	} else {
 		var tok = {
@@ -86,7 +85,7 @@ Lexer.getNextStringToken = function(line){
 			maxType = type;
 		};
 	};
-	if (max == "" && maxType == undefined){
+	if (max === "" && maxType === undefined){
 		//ENTER LEX ERROR HERE (no match)
 		return {error: true, offset: 1};
 	} else {

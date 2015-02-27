@@ -12,7 +12,10 @@ Logger.lex = function(line){
 	}
 }
 Logger.parse = function(line){
-	if(Logger.verbose){
+	if(Logger.verbose) {
 		parseOut.val(parseOut.val() + line + "\n");
 	}
+}
+Logger.parseWarning = function(line){
+	parseOut.val(parseOut.val() + line + "\n");
 }
