@@ -1,5 +1,5 @@
 var compile = document.getElementById("compile");
-var input = $("#input");
+var input = $("#input"); //where user types code
 var parseOut = $("#Parse");
 var tokenOut = $("#Tokens");
 var verb = $("#verbose");
@@ -18,18 +18,23 @@ $(document).ready(function() {
 });
 
 function compileCode() {
+	//reset errors
 	Error.lexErrors = [];
 	Error.parseErrors = [];
+	//clear textareas for output
 	parseOut.val("");
 	tokenOut.val("");
-
+	//lex
 	var tokens = Lexer.lex(input.val().trim());
+	//if there are no errors, yay!
 	if(Error.lexErrors.length > 0) {
+		//add newline if there is already output in the textarea
 		if (tokenOut.val().length > 3){
 			tokenOut.val(tokenOut.val() + "\n");
 		}
 		tokenOut.val(tokenOut.val() + Error.stringifyErrors("lex"));
 	} else {
+		//add newline if there ia already output there
 		if (tokenOut.val().length > 3){
 			tokenOut.val(tokenOut.val() + "\n");
 		}

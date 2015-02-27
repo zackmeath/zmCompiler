@@ -7,24 +7,26 @@ Parser.parse = function(tokens) {
 	Parser.tokens = tokens;
 	parseBlock();
 	if (currentToken() && currentToken() === "EoF"){
-		//parse success!!!
+		//parse success!!! (if there arent errors)
 		consumeToken();
 	} else if (Error.parseErrors.length === 0){
 		Logger.parseWarning("Warning: No EoF(\'$\'') token found, inserted automatically");
 		Parser.tokens.push(Token.generate(0, 0, 'EoF', '$'));
 	} else {
-
+		//we have errors, middleware will handle showing them to the user
 	}
 } 
+//shorthand for getting the current token
 function currentToken(){
 	if (Parser.tokenNum >= (Parser.tokens.length)){
-		return "\'End of input\'";
+		return "\'End of input\'"; // no more tokens left to parse
 	}
 	return Parser.tokens[Parser.tokenNum].type;
 }
+//moves pointer up one and logs the token as consumed
 function consumeToken(){
-	Logger.parse("\tFound Terminal " + (Parser.tokenNum + 1) + ": \'" + Parser.tokens[Parser.tokenNum].value + "\' type: " + Parser.tokens[Parser.tokenNum].type);
-	//console.log(JSON.stringify(Parser.tokens));
+	Logger.parse("\tFound Terminal " + (Parser.tokenNum + 1) + ": \'" + Parser.tokens[Parser.tokenNum].value 
+		+ "\' type: " + Parser.tokens[Parser.tokenNum].type);
 	Parser.tokenNum++;
 }
 
@@ -43,8 +45,10 @@ function parseStatementList(){
 	if (currentToken() === "RightBrace"){
 		consumeToken();
 	} else {
-		if(parseStatement()){
+		if(parseStatement()){ // returns true if there is a statement present
 			parseStatementList();
+		} else {
+			//epsilon
 		}
 	}
 }
@@ -222,7 +226,7 @@ function parseCharList(){
 		consumeToken();
 		parseCharList();
 	} else if (tok === "Quote"){
-		//go back up recursive stack
+		//go back up recursive stack, this string is ending
 	} else {
 		Error.generateParse(currentToken(), "end quote (\"), char, or space");
 	}

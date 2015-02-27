@@ -10,6 +10,7 @@ Token.generate = function(lineNum, charNum, typ, val){
 	};
 	return out;
 }
+//these are the only types of tokens expected in string mode
 Token.stringTypes = {
 	Char: {
 		type: "character",
@@ -24,6 +25,7 @@ Token.stringTypes = {
 		pattern: /^"/,
 	},
 };
+//types of tokens expected in normal mode
 Token.types = {
 	LeftBrace: {
 		type: "left brace",

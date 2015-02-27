@@ -8,28 +8,30 @@ Lexer.lex = function(input) {
 	//break it up by lines
 	var lines = input.split("\n");
 	//for each line
-	for (var lineNumber = 1; lineNumber <= lines.length; lineNumber++) { 
+	for (var lineNumber = 1; lineNumber <= lines.length; lineNumber++) {
+		//do not care about whitespace 
 		var line = lines[lineNumber-1].trim();
 		var charNum = 0;
 
 		while (line.length > 0) {
-			//console.log(line);
+			//string mode determines if we should be looking for chars or identifiers
 			if (stringMode){
 				var tokenData = Lexer.getNextStringToken(line, lineNumber);
 			} else {
 				var tokenData = Lexer.getNextToken(line, lineNumber);
 			}
-			//console.log(JSON.stringify(tokenData));
+
 			if (tokenData.error){
 				Error.generateLex("Lex", "invalid token", line[0], lineNumber, charNum);
 				Logger.lex("ERROR: found invalid token: " + line[0]);
 				charNum++;
-				line = line.substring(1);
-				if (!stringMode){
+				line = line.substring(1); //lets move to the next character and try again
+				if (!stringMode){ // do not get rid of whitespace inside of a string
 					line = line.trim();
 				}
 			} else {
 				if (tokenData.value === "\""){
+					//toggle string mode on every " encountered
 					if (stringMode){
 						Logger.lex("Exiting string mode");
 					} else {
@@ -40,9 +42,8 @@ Lexer.lex = function(input) {
 				Logger.lex("Token match: " + tokenData.value + " is a " + tokenData.tokenType)
 				var tokenObj = Token.generate(lineNumber, charNum, tokenData.tokenType, tokenData.value);
 				output.push(tokenObj);
-				//console.log(JSON.stringify(tokenObj));
-				charNum += tokenData.offset;
-				line = line.substring(tokenData.offset);
+				charNum += tokenData.offset; 
+				line = line.substring(tokenData.offset); //move up to next char after what we found
 				if (!stringMode){
 					line = line.trim();
 				}
@@ -58,12 +59,13 @@ Lexer.getNextToken = function(line){
 	var maxType = undefined;
 	for (var type in Token.types) { //check against every token type
 		var match = line.match(Token.types[type].pattern);
+		//only a good match if it is the longest match
 		if (match != null && match.length > 0 && match[0].length >= 1 && match.length > max.length){
 			max = match[0];
 			maxType = type;
 		};
 	};
-	if (max === "" && maxType === undefined){
+	if (max === "" && maxType === undefined){ //no match found :(
 		return {error: true, offset: 1};
 	} else {
 		var tok = {
@@ -75,6 +77,7 @@ Lexer.getNextToken = function(line){
 	return tok;
 };
 
+//redundant code, TODO for next iteration
 Lexer.getNextStringToken = function(line){
 	var max = "";
 	var maxType = undefined;
@@ -86,7 +89,6 @@ Lexer.getNextStringToken = function(line){
 		};
 	};
 	if (max === "" && maxType === undefined){
-		//ENTER LEX ERROR HERE (no match)
 		return {error: true, offset: 1};
 	} else {
 		var tok = {
@@ -98,6 +100,7 @@ Lexer.getNextStringToken = function(line){
 	return tok;
 };
 
+//takes a list of tokens and turns them into a pretty, human readable string for output
 Lexer.stringifyTokens = function(tokenList) {
 	var out = "Lex was successful!\nList of tokens found:\n";
 	for (token in tokenList) {
