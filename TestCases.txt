@@ -1,0 +1,74 @@
+//1 - simple test
+{
+	int a
+}$
+
+
+//2 - simple lex error
+{
+	int^a
+}$
+
+
+//3 - forgetting EoF character
+{
+	int a
+}
+
+
+//4 - weird testcase from class
+{
+	intfintif=5
+}$
+
+
+//5 - simple parse error
+{
+	int a a	
+}$
+
+//6 - programmer quit halfway through a string for some reason
+{
+	int a
+	a = 3
+	string b
+	b = "testing
+
+
+//7 - borrowed from OmniChron test cases, because it has basically everything that is valid
+{
+    int i
+    i = 0
+    
+    int j
+    j = 0
+    
+    while (j == 0) {
+        i = 1 + i
+        
+        if (i == 3) {
+            j = 1
+        }
+        
+        int g
+        g = 0
+        
+        int h
+        h = 0
+        
+        while (h == 0) {
+            g = 1 + g
+            
+            if (g == 2) {
+                h = 1
+            }
+            
+            print("i")
+            print(g)
+        }
+        
+        print("o")
+        print(i)
+        print(" ")
+    }
+} $

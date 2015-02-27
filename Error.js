@@ -1,6 +1,7 @@
 function Error(){
 
 };
+//lex error
 Error.generateLex = function(type, desc, variable, lineNum, charNum){
 	var err = {
 		type: "Lex",
@@ -11,6 +12,7 @@ Error.generateLex = function(type, desc, variable, lineNum, charNum){
 	};
 	Error.lexErrors.push(err);
 };
+//parse error
 Error.generateParse = function(found, expecting){
 	var err = {
 		type: "Parse",
@@ -20,11 +22,18 @@ Error.generateParse = function(found, expecting){
 	Error.parseErrors.push(err);
 	Logger.parse("Parse Error! found: " + found + ", expecting: " + expecting);
 }
+//lexError.toString()
 Error.stringifyLex = function(error){
 	var errString = error.type + " error found, line: " + error.lineNumber + ", ";
 	errString += error.description + " \"" + error.variable + "\"";
 	return errString;
 };
+//parseError.toString();
+Error.stringifyParse = function(error){
+	return errString = "Parse error! Found: " + error.found  + ", expected: " + error.expecting;
+};
+
+//tokes in "lex" or "parse" so it knows which errors to stringify and how to stringify them
 Error.stringifyErrors = function(module){
 	var errors;
 	var fn;
@@ -44,9 +53,7 @@ Error.stringifyErrors = function(module){
 	};
 	return output;
 };
-Error.stringifyParse = function(error){
-	return errString = "Parse error! Found: " + error.found  + ", expected: " + error.expecting;
-};
+
 
 Error.lexErrors = [];
 Error.parseErrors = [];

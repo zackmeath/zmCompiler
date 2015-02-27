@@ -4,6 +4,7 @@ function Logger(){
 var parseOut = $("#Parse");
 var tokenOut = $("#Tokens");
 
+//keep track of checkbox status
 Logger.verbose = false;
 
 Logger.lex = function(line){
@@ -16,6 +17,7 @@ Logger.parse = function(line){
 		parseOut.val(parseOut.val() + line + "\n");
 	}
 }
+//overwrite verbose restriction (this is important stuff!)
 Logger.parseWarning = function(line){
 	parseOut.val(parseOut.val() + line + "\n");
 }

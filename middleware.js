@@ -14,7 +14,7 @@ $(document).ready(function() {
 	//input.val("{intff=0intif=5}$");
 	input.val("{\nstring a\na = \"t s\"\n}$");
 	compile.onclick = compileCode;
-	compileCode();
+	//compileCode();
 });
 
 function compileCode() {

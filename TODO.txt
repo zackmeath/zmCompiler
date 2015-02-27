@@ -1,0 +1,6 @@
+1. Make token code in Lexer more modular
+2. Structure file system logically
+3. Expand README to be more detailed
+4. Put test case functionality from inside app
+5. Semantic analysis
+6. Code generation!
