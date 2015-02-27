@@ -23,8 +23,8 @@ function currentToken(){
 	return Parser.tokens[Parser.tokenNum].type;
 }
 function consumeToken(){
-	Logger.parse("\tFound Terminal " + (Parser.tokenNum + 1) + ": " + Parser.tokens[Parser.tokenNum].type);
-	console.log(JSON.stringify(Parser.tokens));
+	Logger.parse("\tFound Terminal " + (Parser.tokenNum + 1) + ": \'" + Parser.tokens[Parser.tokenNum].value + "\' type: " + Parser.tokens[Parser.tokenNum].type);
+	//console.log(JSON.stringify(Parser.tokens));
 	Parser.tokenNum++;
 }
 
@@ -116,10 +116,8 @@ function parseAssignment(){
 }
 function parseVarDecl(){
 	Logger.parse("Parsing VarDecl");
-	console.log(currentToken());
 	if (currentToken() === "VarType"){
 		consumeToken();
-		console.log(currentToken());
 		if (currentToken() === "Identifier"){
 			consumeToken();
 		} else {
@@ -189,8 +187,6 @@ function parseIntExpr(){
 		if (currentToken() === "Addition"){
 			parseIntOp();
 			parseExpr();
-		} else{
-			Error.generateParse(currentToken(), "\'+\'");
 		}
 	} else {
 		Error.generateParse(currentToken(), "digit");

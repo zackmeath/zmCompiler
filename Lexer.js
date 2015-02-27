@@ -102,7 +102,7 @@ Lexer.stringifyTokens = function(tokenList) {
 	var out = "Lex was successful!\nList of tokens found:\n";
 	for (token in tokenList) {
 		var data = tokenList[token]
-		out += "\t" + token + ": " + data.type + ", " + data.value + "\n";
+		out += "\t" + (parseInt(token) + 1) + ": " + data.type + ", " + data.value + "\n";
 	};
 	return out;
 };
