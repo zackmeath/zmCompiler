@@ -10,8 +10,12 @@ Parser.parse = function(tokens) {
 		//parse success!!! (if there arent errors)
 		consumeToken();
 	} else if (Error.parseErrors.length === 0){
-		Logger.parseWarning("Warning: No EoF(\'$\'') token found, inserted automatically");
-		Parser.tokens.push(Token.generate(0, 0, 'EoF', '$'));
+		if (Parser.tokenNum === Parser.tokens.length - 1){
+			Logger.parseWarning("Warning: No EoF(\'$\'') token found, inserted automatically");
+			Parser.tokens.push(Token.generate(0, 0, 'EoF', '$'));
+		} else {
+			Error.generateParse(currentToken(), "EoF ($)");
+		}
 	} else {
 		//we have errors, middleware will handle showing them to the user
 	}

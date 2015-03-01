@@ -9,6 +9,9 @@ Lexer.lex = function(input) {
 	var lines = input.split("\n");
 	//for each line
 	for (var lineNumber = 1; lineNumber <= lines.length; lineNumber++) {
+		if (stringMode){
+			Error.generateLex("Lex", "Invalid character in string", 'Newline', lineNumber, charNum);
+		}
 		//do not care about whitespace 
 		var line = lines[lineNumber-1].trim();
 		var charNum = 0;
