@@ -4,3 +4,4 @@
 4. Put test case functionality from inside app
 5. Semantic analysis
 6. Code generation!
+
