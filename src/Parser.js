@@ -1,14 +1,25 @@
 function Parser() {
 
 };
+//console.dir(Tree);
+Parser.cst = undefined;
 Parser.parse = function(tokens) {
+	Parser.stringBuffer = '';
+	Parser.cst = undefined;
+	Parser.cst = new Tree();
+	Parser.cst.addBranchNode('Program');
+
 	Logger.parse("Starting parse...");
 	Parser.tokenNum = 0;
 	Parser.tokens = tokens;
 	parseBlock();
+	Parser.cst.returnToParent(); // should be root
 	if (currentToken() && currentToken() === "EoF"){
 		//parse success!!! (if there arent errors)
 		consumeToken();
+		if(currentToken() !== "\'End of input\'"){
+			Error.generateParse(currentToken(), 'End of input');
+		}
 	} else if (Error.parseErrors.length === 0){
 		if (Parser.tokenNum === Parser.tokens.length - 1){
 			Logger.parseWarning("Warning: No EoF(\'$\'') token found, inserted automatically");
@@ -29,28 +40,49 @@ function currentToken(){
 }
 //moves pointer up one and logs the token as consumed
 function consumeToken(){
-	Logger.parse("\tFound Terminal " + (Parser.tokenNum + 1) + ": \'" + Parser.tokens[Parser.tokenNum].value 
+
+	if (Parser.tokens[Parser.tokenNum].value === '\"'){
+		if (Parser.stringBuffer.length === 0){
+			Parser.stringBuffer += Parser.tokens[Parser.tokenNum].value;
+		} else {
+			Parser.stringBuffer += Parser.tokens[Parser.tokenNum].value;
+			Parser.cst.addLeafNode(Parser.stringBuffer);
+			Parser.stringBuffer = '';
+		}
+	} else {
+		if (Parser.tokens[Parser.tokenNum].value !== '$' && Parser.stringBuffer.length === 0){
+			Parser.cst.addLeafNode(Parser.tokens[Parser.tokenNum]);
+		} else if (Parser.stringBuffer.length !== 0){
+			Parser.stringBuffer += Parser.tokens[Parser.tokenNum].value;
+		}
+	}
+	Logger.parse("   Found Terminal " + (Parser.tokenNum + 1) + ": \'" + Parser.tokens[Parser.tokenNum].value 
 		+ "\' type: " + Parser.tokens[Parser.tokenNum].type);
 	Parser.tokenNum++;
 }
 
 function parseBlock(){
+	Parser.cst.addBranchNode('Block');
 	Logger.parse("Parsing Block");
 	if (currentToken() === "LeftBrace"){
 		consumeToken();
 		parseStatementList();
+		Parser.cst.returnToParent();
 	} else {
 		Error.generateParse(currentToken(), "LeftBrace");
 	}
 }
 
 function parseStatementList(){
+	Parser.cst.addBranchNode('StatementList');
 	Logger.parse("Parsing statement list");
 	if (currentToken() === "RightBrace"){
 		consumeToken();
+		Parser.cst.returnToParent();
 	} else {
 		if(parseStatement()){ // returns true if there is a statement present
 			parseStatementList();
+			Parser.cst.returnToParent();
 		} else {
 			//epsilon
 		}
@@ -58,31 +90,38 @@ function parseStatementList(){
 }
 
 function parseStatement(){
+	Parser.cst.addBranchNode('Statement');
 	Logger.parse("Parsing statement");
 	var token = currentToken();
 	if (token === "Print"){
 		Logger.parse("Print statement found, going to print...");
 		parsePrint();
+		Parser.cst.returnToParent();
 		return true;
 	} else if (token === "Identifier"){
 		Logger.parse("Identifier found, going to assignment...");
 		parseAssignment();
+		Parser.cst.returnToParent();
 		return true;
 	} else if (token === "VarType"){
 		Logger.parse("VarType found, going to VarDecl...");
 		parseVarDecl();
+		Parser.cst.returnToParent();
 		return true;
 	} else if (token === "While"){
 		Logger.parse("While found, going to while...");
 		parseWhile();
+		Parser.cst.returnToParent();
 		return true;
 	} else if (token === "If") {
 		Logger.parse("If statement found, going to if...");
 		parseIf();
+		Parser.cst.returnToParent();
 		return true;
 	} else if (token === "LeftBrace"){
 		Logger.parse("\'{\' found, going to new block...");
 		parseBlock();
+		Parser.cst.returnToParent();
 		return true;
 	} else {
 		Error.generateParse(currentToken(), "Statement or \'}\'");
@@ -90,6 +129,7 @@ function parseStatement(){
 	}
 }
 function parsePrint(){
+	Parser.cst.addBranchNode('Print');
 	Logger.parse("Parsing print");
 	if (currentToken() === "Print"){
 		consumeToken();
@@ -98,6 +138,7 @@ function parsePrint(){
 			parseExpr();
 			if (currentToken() === "RightParen"){
 				consumeToken();
+				Parser.cst.returnToParent();
 			} else {
 				Error.generateParse(currentToken(), "\')\'");
 			}
@@ -109,12 +150,18 @@ function parsePrint(){
 	}
 }
 function parseAssignment(){
+	Parser.cst.addBranchNode('Assignment');
 	Logger.parse("Parsing Assignment");
 	if (currentToken() === "Identifier"){
+		Parser.cst.addBranchNode('Id');
+		Parser.cst.addBranchNode('Char');
 		consumeToken();
+		Parser.cst.returnToParent();
+		Parser.cst.returnToParent();
 		if (currentToken() === "Assignment"){
 			consumeToken();
 			parseExpr();
+			Parser.cst.returnToParent();
 		} else {
 			Error.generateParse(currentToken(), "\'=\'");
 		}
@@ -123,11 +170,19 @@ function parseAssignment(){
 	}
 }
 function parseVarDecl(){
+	Parser.cst.addBranchNode('VarDecl');
 	Logger.parse("Parsing VarDecl");
 	if (currentToken() === "VarType"){
+		Parser.cst.addBranchNode('Type');
 		consumeToken();
+		Parser.cst.returnToParent();
 		if (currentToken() === "Identifier"){
+			Parser.cst.addBranchNode('Id');
+			Parser.cst.addBranchNode('Char');
 			consumeToken();
+			Parser.cst.returnToParent();
+			Parser.cst.returnToParent();
+			Parser.cst.returnToParent();
 		} else {
 			Error.generateParse(currentToken(), "Identifier");
 		}
@@ -136,41 +191,55 @@ function parseVarDecl(){
 	}
 }
 function parseWhile(){
+	Parser.cst.addBranchNode('While');
 	Logger.parse("Parsing while");
 	if (currentToken() === "While"){
 		consumeToken();
 		parseBooleanExpr();
 		parseBlock();
+		Parser.cst.returnToParent();
 	} else {
 		Error.generateParse(currentToken(), "\'while\' statement");
 	}
 }
 function parseIf(){
+	Parser.cst.addBranchNode('If');
 	Logger.parse("Parsing if");
 	if (currentToken() === "If"){
 		consumeToken();
 		parseBooleanExpr();
 		parseBlock();
+		Parser.cst.returnToParent();
 	} else {
 		Error.generateParse(currentToken(), "\'if\' statement");
 	}
 } 
 function parseExpr(){
+	Parser.cst.addBranchNode('Expr');
 	Logger.parse("Parsing expr");
 	var tok = currentToken();
 	if (tok === "Digit"){
 		parseIntExpr();
+		Parser.cst.returnToParent();
 	} else if (tok === "Quote"){
 		parseStringExpr();
+		Parser.cst.returnToParent();
 	} else if (tok === "LeftParen" || tok === "Bool") {
 		parseBooleanExpr();
+		Parser.cst.returnToParent();
 	} else if (tok === "Identifier"){
+		Parser.cst.addBranchNode('Id');
+		Parser.cst.addBranchNode('Char');
 		consumeToken();
+		Parser.cst.returnToParent();
+		Parser.cst.returnToParent();
+		Parser.cst.returnToParent();
 	} else {
 		Error.generateParse(currentToken(), "Expression");
 	}
 }
 function parseBooleanExpr(){
+	Parser.cst.addBranchNode('BooleanExpr');
 	Logger.parse("Parsing BooleanExpr");
 	if (currentToken() === "LeftParen"){
 		consumeToken();
@@ -179,34 +248,46 @@ function parseBooleanExpr(){
 		parseExpr();
 		if (currentToken() === "RightParen"){
 			consumeToken();
+			Parser.cst.returnToParent();
 		} else {
 			Error.generateParse(currentToken(), "\')\'");
 		}
 	} else if (currentToken() === "Bool"){
+		Parser.cst.addBranchNode('BoolValue');
 		consumeToken();
+		Parser.cst.returnToParent();
+		Parser.cst.returnToParent();
 	} else {
 		Error.generateParse(currentToken(), "Boolean Expression");
 	}
 }
 function parseIntExpr(){
+	Parser.cst.addBranchNode('IntExpr');
 	Logger.parse("Parsing IntExpr");
 	if (currentToken() === "Digit"){
+		Parser.cst.addBranchNode('Digit');
 		consumeToken();
+		Parser.cst.returnToParent();
 		if (currentToken() === "Addition"){
 			parseIntOp();
 			parseExpr();
+			Parser.cst.returnToParent();
+		} else {
+			Parser.cst.returnToParent();
 		}
 	} else {
 		Error.generateParse(currentToken(), "digit");
 	}
 }
 function parseStringExpr(){
+	Parser.cst.addBranchNode('StringExpr');
 	Logger.parse("Parsing stringExpr");
 	if (currentToken() === "Quote"){
 		consumeToken();
 		parseCharList();
 		if (currentToken() === "Quote"){
 			consumeToken();
+			Parser.cst.returnToParent();
 		} else {
 			Error.generateParse(currentToken(), "\"");
 		}
@@ -216,9 +297,11 @@ function parseStringExpr(){
 	
 }
 function parseIntOp(){
+	Parser.cst.addBranchNode('IntOP');
 	Logger.parse("Parsing intOp");
 	if (currentToken() === "Addition"){
 		consumeToken();
+		Parser.cst.returnToParent();
 	} else {
 		Error.generateParse(currentToken(), "\'+\'");
 	}
@@ -236,10 +319,12 @@ function parseCharList(){
 	}
 }
 function parseBoolOp(){
+	Parser.cst.addBranchNode('BoolOp');
 	Logger.parse("Parsing boolOp");
 	var tok = currentToken();
 	if (tok === "Comparison" || tok === "NotComparison"){
 		consumeToken();
+		Parser.cst.returnToParent();
 	} else {
 		Error.generateParse(currentToken(), "\'==\' or \'!=\'");
 	}

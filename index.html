@@ -7,6 +7,18 @@
     <title>zmCompiler</title>
     <!-- Bootstrap -->
     <link href="resources/bootstrap-3.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jqtree -->
+    <link rel="stylesheet" href="resources/jqTree/jqtree.css">
+    <style>
+.treeScrollableBoxes {
+  height: 415px;
+  overflow: scroll;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #c1c1c1;
+  border-radius: 3px
+}
+</style>
   </head>
     <nav class="navbar navbar-default">
   <div class="container-fluid">
@@ -35,28 +47,37 @@
         <div class="col-md-4">
               <label for="Code">Enter code here:</label>
               <textarea id="input" placeholder="Enter code here" rows="20" cols="60" class="form-control"></textarea>
-              <p></p>
-              <div class="row">
-                <div class="col-md-4">
-                  <button id="compile" type="button" class="btn btn-lg btn-success">Compile</button>
-                </div>
-              <div class="col-md-8">
-                <div class="checkbox" id="verbose" ontoggle="cbToggle()" onclick="cbToggle()">
+        </div>
+      
+        <div class="col-md-4">
+            <label for="Tokens">Log:</label>
+            <textarea class="form-control" rows="20" id="Tokens"></textarea>
+        </div>
+        <div class="col-md-4">
+          <label>Trees:</label>
+          <button id="cst" type="button" class="btn btn-xs btn-primary">CST</button>
+          <button id="ast" type="button" class="btn btn-xs btn-primary">AST</button>
+          <div class='treeScrollableBoxes'>
+            <!-- <textarea class="form-control" rows="20" id="TreeTA"></textarea> -->
+            <div id="tree1"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <p> </p>
+      <div class="row-fluid">
+        <div class="col-md-3">
+          <button id="compile" type="button" class="btn btn-lg btn-success">Compile</button>
+          <div class="checkbox" id="verbose" ontoggle="cbToggle()" onclick="cbToggle()">
                   <label>
                     <input type="checkbox"> Verbose
                   </label>
                 </div>
-              </div>
-            </div>
         </div>
-      
-        <div class="col-md-4">
-            <label for="Tokens">Token Stream:</label>
-            <textarea class="form-control" rows="20" id="Tokens"></textarea>
-        </div>
-        <div class="col-md-4">
-            <label for="Parse">Parse Output:</label>
-            <textarea class="form-control" rows="20" id="Parse"></textarea>
+        <div class="col-md-9">
+          <label>Machine Code:</label>
+          <textarea id="output" rows="8" cols="60" class="form-control"></textarea>
         </div>
       </div>
     </div>
@@ -67,14 +88,22 @@
     <!-- line numbers for input textarea -->
     <script src="resources/linedTextArea/jquery-linedtextarea.js"></script>
     <link href="resources/linedTextArea/jquery-linedtextarea.css" type="text/css" rel="stylesheet" />
+    <!-- Tree display dependancies -->
+    <script src="resources/jqTree/tree.jquery.js"></script>
 
     <!-- Compiler dependencies -->
-    <script src="src/Middleware.js"></script>
-    <script src="src/Lexer.js"></script>
-    <script src="src/Parser.js"></script>
     <script src="src/utils/Token.js"></script>
     <script src="src/utils/Error.js"></script>
     <script src="src/utils/Logger.js"></script>
+    <script src="src/utils/Tree.js"></script>
+    <script src="src/utils/Scope.js"></script>
+    <script src="src/CodeGenerator.js"></script>
+    <script src="src/Middleware.js"></script>
+    <script src="src/Lexer.js"></script>
+    <script src="src/Parser.js"></script>
+    <script src="src/SemanticAnalyser.js"></script>
+    
+
 
   </body>
 </html>

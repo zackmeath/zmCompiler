@@ -20,7 +20,22 @@ Error.generateParse = function(found, expecting){
 		expecting: expecting
 	};
 	Error.parseErrors.push(err);
-	Logger.parse("Parse Error! found: " + found + ", expecting: " + expecting);
+	Logger.parse("Parse Error found: " + found + ", expecting: " + expecting);
+}
+Error.generateSemantic = function(description){
+	var err = {
+		type: "Semantic",
+		desc: description,
+	};
+	Error.semanticErrors.push(err);
+	//Logger.semanticLog("\nSemantic Error found: " + description);
+}
+Error.generateCodeGen = function(description){
+	var err = {
+		type: "CodeGeneration",
+		desc: description,
+	};
+	Error.codeGenErrors.push(err);
 }
 //lexError.toString()
 Error.stringifyLex = function(error){
@@ -32,7 +47,12 @@ Error.stringifyLex = function(error){
 Error.stringifyParse = function(error){
 	return errString = "Parse error! Found: " + error.found  + ", expected: " + error.expecting;
 };
-
+Error.stringifySemantic = function(error){
+	return "\nSemantic Error: " + error.desc;
+}
+Error.stringifyCodeGen = function(error){
+	return '\nCode Gen Error: ' + error.desc;
+}
 //tokes in "lex" or "parse" so it knows which errors to stringify and how to stringify them
 Error.stringifyErrors = function(module){
 	var errors;
@@ -43,6 +63,12 @@ Error.stringifyErrors = function(module){
 	} else if (module === "parse"){
 		errors = Error.parseErrors;
 		fn = Error.stringifyParse
+	} else if (module === "semantic"){
+		errors = Error.semanticErrors;
+		fn = Error.stringifySemantic;
+	} else if(module === 'codeGen') {
+		errors = Error.codeGenErrors;
+		fn = Error.stringifyCodeGen;
 	} else {
 		errors = Error.lexErrors;
 		fn = Error.stringifyLex;
@@ -57,3 +83,5 @@ Error.stringifyErrors = function(module){
 
 Error.lexErrors = [];
 Error.parseErrors = [];
+Error.semanticErrors = [];
+Error.codeGenErrors = [];
