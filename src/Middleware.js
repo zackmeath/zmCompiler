@@ -20,7 +20,7 @@ $(document).ready(function() {
 	// 	"print((true == true))\n    print((false == false))\n} $");
 	// input.val('{\n   int a\n   a = 4\n}$');
 	input.val("{\n   int a\n   a = 1\n   int c\n   c = 2 + a\n   {\n      string a\n      a = \"a\"\n      print (a)\n   }\n   " + 
-		"if (a == 1){\n      print (a)\n   }\n   string f\n}$");
+		"if (a == 1){\n      print (c)\n   }\n}$");
 	output.val('00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ' + 
 		'00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ' + 
 		'00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ' + 
@@ -35,7 +35,7 @@ $(document).ready(function() {
 	compile.onclick = compileCode;
 	cstButton.onclick = showCST;
 	astButton.onclick = showAST;
-	compileCode();
+	compileCode(); // Comment this out to not compile on load
 });
 
 function compileCode() {

@@ -1,10 +1,8 @@
-1. Make token code in Lexer more modular
-2. Structure file system logically (src and lib)
-3. Merge output logs into one textarea because 3+ is too many
-4. Expand README to be more detailed
-5. Put test case functionality from inside app (dropdown)
-6. linedTextArea
-7. Extra branches for project 1,2,3 etc 
-8. Semantic analysis
-9. Code generation!
-10. Update TODO list (so much recursion...)
+unused vars
+
+
+- Put test case functionality from inside app (dropdown)
+- linedTextArea
+- Semantic analysis
+- Code generation!
+- Update TODO list (so much recursion...)
