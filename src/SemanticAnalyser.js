@@ -7,6 +7,7 @@ SemanticAnalyser.currentScope = undefined;
 SemanticAnalyser.lastScope = undefined;
 SemanticAnalyser.scopeNum = 0;
 SemanticAnalyser.generateAST = function(cst){
+    Logger.warning('\nGenerating AST...');
     SemanticAnalyser.lastScope = undefined;
     SemanticAnalyser.ast = new Tree();
     SemanticAnalyser.symbolTable = {};
@@ -18,14 +19,14 @@ SemanticAnalyser.generateAST = function(cst){
             '{': true,
             '}': true,
             '(': true,
-                ')': true,
-                '=': true,
-                    '==': true,
-                    '!=': true,
+            ')': true,
+            '=': true,
+            '==': true,
+            '!=': true,
             'while': true,
             'print': true,
             'if': true,
-                '+': true,
+            '+': true,
             'Digit': true,
             'BoolValue': true,
             'false': true,
@@ -78,16 +79,17 @@ SemanticAnalyser.generateAST = function(cst){
         }
     }
     traverseCST(cst.root.children[0]);
+    return SemanticAnalyser.ast;
 }
 SemanticAnalyser.analyze = function(){
-    Logger.semanticLog('\n\nStarting Semantic Analysis...');
+    Logger.warning('Starting Semantic Analysis...');
     SemanticAnalyser.currentScope = undefined;
     SemanticAnalyser.scopeNum = 0;
     SemanticAnalyser.check(SemanticAnalyser.ast.root);
 }
 SemanticAnalyser.check = function(node){
     if (node.value === '{}'){
-        Logger.semanticLog('Found block, creating new scope(' + SemanticAnalyser.scopeNum +')...');
+        Logger.log('Found block, creating new scope(' + SemanticAnalyser.scopeNum +')...');
         if (SemanticAnalyser.currentScope === undefined){
             var adding = new Scope(SemanticAnalyser.scopeNum)
                 SemanticAnalyser.currentScope = adding;
@@ -105,7 +107,7 @@ SemanticAnalyser.check = function(node){
         SemanticAnalyser.lastScope = SemanticAnalyser.currentScope;
         SemanticAnalyser.currentScope = SemanticAnalyser.currentScope.parent;
     } else if (node.value === 'VarDecl'){
-        Logger.semanticLog('Found VarDecl...');
+        Logger.log('Found VarDecl...');
         var varType = node.children[0];
         var id = node.children[1];
         if (SemanticAnalyser.currentScope.vars[id.value] !== undefined){
@@ -115,7 +117,7 @@ SemanticAnalyser.check = function(node){
                 Error.generateSemantic('ID \'' + id.value + '\' declared with multiple types in the same scope');
             }
         } else {
-            Logger.semanticLog('Inserting variable \'' + id.value + '\' into symbol table...');
+            Logger.log('Inserting variable \'' + id.value + '\' into symbol table...');
             SemanticAnalyser.symbolTable
                 SemanticAnalyser.currentScope.vars[id.value] = {
                     id: id.value,
@@ -125,7 +127,7 @@ SemanticAnalyser.check = function(node){
                 }
         }
     } else if (node.value === '='){
-        Logger.semanticLog('Found Assignment, checking types...');
+        Logger.log('Found Assignment, checking types...');
         var variable = node.children[0];
         var value = node.children[1];
         var valueType = getExprType(value);
@@ -134,10 +136,10 @@ SemanticAnalyser.check = function(node){
             Error.generateSemantic('Assignment to variable \'' + variable.value + 
                     '\' is the incorrect type, should be type \'' + varType + '\'');
         } else {
-            Logger.semanticLog('\tMatching types');
+            Logger.log('\tMatching types');
         }
     } else if (node.value === '==' || node.value === '!='){
-        Logger.semanticLog('Found BoolOp, checking types...');
+        Logger.log('Found BoolOp, checking types...');
         var left = node.children[0];
         var right = node.children[1];
         var leftType = getExprType(left);
@@ -146,7 +148,7 @@ SemanticAnalyser.check = function(node){
             Error.generateSemantic('Comparison operator cannot compare type \'' + 
                     leftType + '\' with type \'' + rightType + '\'');
         } else {
-            Logger.semanticLog('\tMatching types');
+            Logger.log('\tMatching types');
         }
     } else {
         node.children.forEach(function(child){
@@ -156,7 +158,7 @@ SemanticAnalyser.check = function(node){
 }
 getExprType = function(node){
     var value = node.value;
-    Logger.semanticLog('Evaluating type of ' + value);
+    Logger.log('Evaluating type of ' + value);
     var nums = {'1':true,'2':true,'3':true,'4':true,'5':true,'6':true,'7':true,'8':true,'9':true,'0':true};
     if (value.charAt(0) === '\"'){
         return 'string';
@@ -198,7 +200,7 @@ getExprType = function(node){
     }
 }
 varTypeLookup = function(variable){
-    Logger.semanticLog('Retrieving type of \'' + variable + '\' from symbol table');   var scope = SemanticAnalyser.currentScope;
+    Logger.log('Retrieving type of \'' + variable + '\' from symbol table');   var scope = SemanticAnalyser.currentScope;
     var scope = SemanticAnalyser.currentScope;
     while (scope.vars[variable] === undefined){
         if ((scope.parent === null || scope.parent === undefined) || (Object.keys(scope.parent).length > 15)){
@@ -233,7 +235,6 @@ varValueLookup = function(variable){
 }
 SemanticAnalyser.buildSymbolTable = function(){
     var parentScope = SemanticAnalyser.lastScope;
-
     var processScope = function(scope){
         Object.keys(scope.vars).forEach(function(variable){
             SemanticAnalyser.symbolTable[scope.num + variable] = scope.vars[variable];
@@ -243,13 +244,5 @@ SemanticAnalyser.buildSymbolTable = function(){
         });
     }
     processScope(parentScope);
-}
-
-SemanticAnalyser.displaySymbolTable = function(){
-    Logger.semanticWarning('\nSymbol Table:');
-    Logger.semanticWarning('Scope  ID   Type');
-    Object.keys(SemanticAnalyser.symbolTable).forEach(function(entry){
-        Logger.semanticWarning('  ' + entry.charAt(0) + '     ' + SemanticAnalyser.symbolTable[entry].id +
-                '    ' + SemanticAnalyser.symbolTable[entry].type);
-    });
+    return SemanticAnalyser.symbolTable;
 }

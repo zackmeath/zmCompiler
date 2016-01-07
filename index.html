@@ -43,46 +43,53 @@
     
   <body>
     <div class="container">
-      <div class="row-fluid">
-        <div class="col-md-4">
-              <label for="Code">Enter code here:</label>
-              <textarea id="input" placeholder="Enter code here" rows="20" cols="60" class="form-control"></textarea>
+        <div class="row-fluid">
+            <div class="col-md-12">
+                <div class="btn-toolbar" id="ProgramButtons">
+                </div>
+            </div>
         </div>
-      
-        <div class="col-md-4">
-            <label for="Tokens">Log:</label>
-            <textarea class="form-control" rows="20" id="Tokens"></textarea>
+        <div class="row-fluid">
+            <div class="col-md-4">
+                <label for="Code">Enter code here:</label>
+                <textarea id="input" placeholder="Enter code here" rows="20" cols="60" class="form-control"></textarea>
+            </div>
+
+            <div class="col-md-4">
+                <label for="Tokens">Log:</label>
+                <textarea class="form-control" rows="20" id="Tokens"></textarea>
+            </div>
+            <div class="col-md-4">
+                <label>Trees:</label>
+                <button id="cst" type="button" class="btn btn-xs btn-primary">CST</button>
+                <button id="ast" type="button" class="btn btn-xs btn-primary">AST</button>
+                <div class='treeScrollableBoxes'>
+                    <!-- <textarea class="form-control" rows="20" id="TreeTA"></textarea> -->
+                    <div id="tree1"></div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-4">
-          <label>Trees:</label>
-          <button id="cst" type="button" class="btn btn-xs btn-primary">CST</button>
-          <button id="ast" type="button" class="btn btn-xs btn-primary">AST</button>
-          <div class='treeScrollableBoxes'>
-            <!-- <textarea class="form-control" rows="20" id="TreeTA"></textarea> -->
-            <div id="tree1"></div>
-          </div>
-        </div>
-      </div>
     </div>
     <div class="container">
-      <p> </p>
-      <div class="row-fluid">
-        <div class="col-md-3">
-          <button id="compile" type="button" class="btn btn-lg btn-success">Compile</button>
-          <div class="checkbox" id="verbose" ontoggle="cbToggle()" onclick="cbToggle()">
-                  <label>
-                    <input type="checkbox"> Verbose
-                  </label>
+        <p> </p>
+        <div class="row-fluid">
+            <div class="col-md-3">
+                <button id="compile" type="button" class="btn btn-lg btn-success">Compile</button>
+                <div class="checkbox" id="verbose" ontoggle="cbToggle()" onclick="cbToggle()">
+                    <label>
+                        <input type="checkbox"> Verbose
+                    </label>
                 </div>
+            </div>
+            <div class="col-md-9">
+                <label>Machine Code:</label>
+                <textarea id="output" rows="8" cols="60" class="form-control"></textarea>
+            </div>
         </div>
-        <div class="col-md-9">
-          <label>Machine Code:</label>
-          <textarea id="output" rows="8" cols="60" class="form-control"></textarea>
-        </div>
-      </div>
     </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="resources/jQuery/jquery-1.11.3.min.js"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script> -->
     <!-- Include all compiled plugins -->
     <script src="resources/bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
     <!-- line numbers for input textarea -->
@@ -102,7 +109,8 @@
     <script src="src/Lexer.js"></script>
     <script src="src/Parser.js"></script>
     <script src="src/SemanticAnalyser.js"></script>
-    
+    <script src="src/Display.js"></script>
+
 
 
   </body>

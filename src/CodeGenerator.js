@@ -4,6 +4,7 @@ function CodeGen(){
 CodeGen.staticTable = {};
 CodeGen.jumpTable = {};
 CodeGen.generateCode = function(ast){
+
     //reset
     CodeGen.quickVarReference = {};
     CodeGen.staticTable = {};
@@ -18,6 +19,7 @@ CodeGen.generateCode = function(ast){
     var varNum = 0;
     //reset
 
+    Logger.warning('\nStarting Code Generation...');
 
     var processNode = function(node){
         var exitScope = false;
@@ -80,12 +82,12 @@ CodeGen.generateCode = function(ast){
     }
     processNode(ast.root);
     CodeGen.backpatch();
-    Logger.writeMachineCode(CodeGen.code, CodeGen.endBytesUsed);
+    var result = Logger.writeMachineCode(CodeGen.code, CodeGen.endBytesUsed);
+    return result;
 }
 
 CodeGen.backpatch = function(){
     var byteLocation = CodeGen.code.length + 1;
-
     Object.keys(CodeGen.staticTable).forEach(function(varKey){
         var replaceThis = CodeGen.staticTable[varKey].substring(0, 2);
         var withThis = intToHex(byteLocation);
@@ -236,7 +238,6 @@ genPrint = function(node, scopeNum){
             //while child[1] === +
         }
     } else {
-        console.log('printing a variable');
         if (varLookup(variable, scopeNum).type === 'int'){
             loadYMem(CodeGen.staticTable[scopeNum + variable]);
             loadXConstant(1);
