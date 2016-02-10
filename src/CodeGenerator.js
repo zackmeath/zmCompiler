@@ -38,8 +38,11 @@ CodeGen.backpatch = function(){
         if (backpatchTable[code] !== undefined){
             CodeGen.code[i] = backpatchTable[code];
         }
+        if (CodeGen.jumpTable[code] !== undefined){
+            CodeGen.code[i] = intToHex(CodeGen.jumpTable[code]);
+        }
     }
-    // TODO While traversing, also fill in jump table values
+    // While traversing, also fill in jump table values
 }
 
 var generateCode = function(ast){
