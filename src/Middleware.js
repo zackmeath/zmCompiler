@@ -29,7 +29,10 @@ $(document).ready(function() {
             "\n\n{\nint a\na = 1\n}$" +
             "\n\n{int a \na = 1 + 2 + 3}$" +
             "\n\n{}$" +
-            "\n\n{print(1 + 2 + 3)}$" );
+            "\n\n{print(1 + 2 + 3)}$" + 
+            "\n\n{int a\nif(a == 1){print (9)}}$" + 
+            "\n\n{print((1 == 1))}$"
+            );
     output.val('00');
     for (var i = 1; i < 256; i++){
         output.val(output.val() + ' 00');
