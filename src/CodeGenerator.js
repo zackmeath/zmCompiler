@@ -24,8 +24,22 @@ CodeGen.generateCode = function(ast){
 }
 
 CodeGen.backpatch = function(){
-    // TODO Create variable references via the static table to allow a location for each variable
-    // TODO Traverse the CodeGen.code array and replace all references with real location
+    // Create variable references via the static table to allow a location for each variable
+    var backpatchTable = {};
+    var nextPosition = CodeGen.code.length + 1;
+    for (var key in CodeGen.staticTable) {
+        var val = CodeGen.staticTable[key];
+        backpatchTable[val] = intToHex(nextPosition++);
+    }
+
+    // Traverse the CodeGen.code array and replace all references with real location
+    for (var i = 0; i < CodeGen.code.length; i++){
+        var code = CodeGen.code[i];
+        if (backpatchTable[code] !== undefined){
+            CodeGen.code[i] = backpatchTable[code];
+        }
+    }
+
     // TODO While traversing, also fill in jump table values
 }
 
@@ -113,6 +127,7 @@ var genAssignment = function(node, scopeNum) {
             var secondChild = node.children[1];
             if(secondChild.value === '+'){
                 add(secondChild);
+                storeAcc(storageLocation + '00');
             } else {
                 if (isNaN(parseInt(secondChild.value))) { // Variable
                     loadAccMem(getVariableKey(secondChild.value, scopeNum) + '00');
@@ -156,7 +171,32 @@ var genPrint = function(node, scopeNum) {
     } else if (value === '!=') { // Boolean Expression
         // TODO
     } else if (value === '+') { // Addition
-        // TODO
+        assignVariableKey('+', 1);
+        var storageLocation = CodeGen.staticTable['+' + 1];
+        var add = function(node){
+            var firstChild = node.children[0];
+            var secondChild = node.children[1];
+            if(secondChild.value === '+'){
+                add(secondChild);
+            } else {
+                if (isNaN(parseInt(secondChild.value))) { // Variable
+                    loadAccMem(getVariableKey(secondChild.value, scopeNum) + '00');
+                } else { // Int
+                    loadAcc(parseInt(secondChild.value));
+                }
+                storeAcc(storageLocation + '00');
+            }
+            if (isNaN(parseInt(firstChild.value))) { // Variable
+                loadAccMem(getVariableKey(firstChild.value, scopeNum) + '00');
+            } else { // Int
+                loadAcc(parseInt(firstChild.value));
+            }
+            addWithCarry(storageLocation + '00');
+            storeAcc(storageLocation + '00');
+        }
+        add(node.children[0]);
+        loadYMem(storageLocation + '00');
+        loadXConstant(1);
     } else if (value === 'false') { // Boolean Literal
         // TODO
     } else if (value === 'true') { // Boolean Literal

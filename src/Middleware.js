@@ -24,7 +24,12 @@ $(document).ready(function() {
     // 	"print((true == true))\n    print((false == false))\n} $");
     // input.val('{\n   int a\n   a = 4\n}$');
     input.val("{\n   int a\n   a = 1\n   int c\n   c = 2 + a\n   {\n      string a\n      a = \"a\"\n      print (a)\n   }\n   " + 
-            "if (a == 1){\n      print (c)\n   }\n}$\n\n{\na = 1\n}$\n\n{\nint a\na = 1\n}$\n\n{int a \na = 1 + 2 + 3}$");
+            "if (a == 1){\n      print (c)\n   }\n}$" + 
+            "\n\n{\na = 1\n}$" + 
+            "\n\n{\nint a\na = 1\n}$" +
+            "\n\n{int a \na = 1 + 2 + 3}$" +
+            "\n\n{}$" +
+            "\n\n{print(1 + 2 + 3)}$" );
     output.val('00');
     for (var i = 1; i < 256; i++){
         output.val(output.val() + ' 00');
