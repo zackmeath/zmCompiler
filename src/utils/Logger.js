@@ -18,18 +18,18 @@ Logger.warning = function(line){
     tokenOut.val(tokenOut.val() + line + "\n");
 }
 
-Logger.writeMachineCode = function(code, heap){
+Logger.writeMachineCode = function(code, endBytes){
     output.val('');
-    var space = 255 - heap.length;
-    for (var i = 0; i <= space; i++){
-        if (code[i]){
-            output.val(output.val() + code[i].toUpperCase() + ' ');
-        } else {
-            output.val(output.val() + '00' + ' ');
-        }
+    var space = 255 - endBytes.length;
+    for (var i = 0; i < code.length; i++){
+        output.val(output.val() + code[i].toUpperCase() + ' ');
     }
-    for (var i = 0; i < heap.length; i++){
-        output.val(output.val() + heap[i] + ' ')
+    var emptySpaceLength = 256 - (code.length + endBytes.length);
+    for (var i = 0; i < 256 - (code.length + endBytes.length); i++){
+        output.val(output.val() + '00' + ' ');
+    }
+    for (var i = 0; i < endBytes.length; i++){
+        output.val(output.val() + endBytes[i] + ' ')
     }
     return output.val();
 }
