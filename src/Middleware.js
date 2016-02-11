@@ -27,7 +27,10 @@ $(document).ready(function() {
             // "\n\n{int a\nif(a == 1){print (9)}}$" + 
             // "\n\n{string a\na = \"string\"\n{print (a)}}$" +
             // "\n\n{int a\na = 1 + 2 + 3\n print(a)}$" +
-            "{\nstring a\na = \"abc\"\nprint(a)\n}$"
+            "{\nstring a\na = \"abc\"\nprint(a)\n}$" +
+            "{if(1!=1){\nprint(8)}\n}$" +
+            "{\nint a\na=1\nwhile(a == 1){    a = 1 + a\n}\nprint(a)}$" +
+            "{\nint a\na=1\nwhile(a != 5){\n    print(a)\n    a = 1 + a\n}\nprint(\"done\")}$"
             );
     output.val('00');
     for (var i = 1; i < 256; i++){

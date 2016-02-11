@@ -25,7 +25,6 @@ CodeGen.generateCode = function(ast, symbolTable){
 }
 
 CodeGen.backpatch = function(){
-    console.log(CodeGen.staticTable);
     // Create variable references via the static table to allow a location for each variable
     var backpatchTable = {};
     var nextPosition = CodeGen.code.length + 1;
@@ -59,8 +58,10 @@ var generateCode = function(ast){
         var exitScope     = false;
         var endIf         = false;
         var endWhile      = false;
-        var jumpKey       = 'J' + CodeGen.jumpNum;
+        var jumpId        = 'J' + CodeGen.jumpNum;
         var genFirstChild = true;
+        var previousCodeLength = CodeGen.code.length;
+        var whileCodeLength = CodeGen.code.length;
 
         if (node.value === '{}'){
             exitScope = true;
@@ -74,20 +75,17 @@ var generateCode = function(ast){
             genVarDecl(node, currentScope);
         } else if(node.value === 'If'){
             endIf = true;
-            CodeGen.jumpNum++;
-            genIf(node, currentScope);
+            previousCodeLength = genIf(node, currentScope);
             genFirstChild = false;
         } else if(node.value === 'while'){
-            CodeGen.jumpNum++;
-            endIf = true;
-            genWhile(node, currentScope);
+            endWhile = true;
+            whileCodeStart = CodeGen.code.length;
+            previousCodeLength = genWhile(node, currentScope);
             genFirstChild = false;
         } else {
             // No other cases
             return;
         }
-
-        var previousCodeLength = CodeGen.code.length;
 
         var startingIndex = (genFirstChild) ? 0 : 1;
         for (var i = startingIndex; i < node.children.length; i++) {
@@ -95,15 +93,26 @@ var generateCode = function(ast){
             evaluateNode(child);
         }
 
-        var currentCodeLength = CodeGen.code.length;
-        var jumpLength = (currentCodeLength - previousCodeLength);
-
         if (endIf) {
-            CodeGen.jumpTable[jumpKey] = jumpLength;
+            var currentCodeLength = CodeGen.code.length;
+            var jumpLength = (currentCodeLength - previousCodeLength);
+            CodeGen.jumpTable['J' + CodeGen.jumpNum] = jumpLength;
             CodeGen.jumpNum++;
         }
         if (endWhile) {
-            CodeGen.jumpTable[jumpKey] = jumpLength;
+            var key = getVariableKey(0, currentScope);
+            loadAcc(0);
+            storeAcc(key);
+            loadXConstant(1);
+            compareXToMem(key);
+            var spot = intToHex(CodeGen.code.length + 2);
+            branchIfZFlag(spot);
+            CodeGen.jumpTable['J' + spot] = (256 - CodeGen.code.length) + whileCodeStart;
+
+            // Same as if
+            var currentCodeLength = CodeGen.code.length;
+            var jumpLength = (currentCodeLength - previousCodeLength);
+            CodeGen.jumpTable['J' + CodeGen.jumpNum] = jumpLength;
             CodeGen.jumpNum++;
         }
         if (exitScope) { currentScope = currentScope.parent; }
@@ -127,10 +136,10 @@ var genAssignment = function(node, scope) {
     } else if (value.substr(0,1) === '\"') { // String constant
         var stringValue = value.substr(1, value.length - 2);
         var stringLocation = getStringLocation(stringValue, scope);
-        console.log(stringLocation);
         loadAcc(intToHex(stringLocation));
         storeAcc(key);
     } else if (value === '+') { // Addition
+        node = node.children[1];
         assignVariableKey('+', 0);
         var storageLocation = CodeGen.staticTable['+' + 0];
         var add = function(node) {
@@ -147,11 +156,7 @@ var genAssignment = function(node, scope) {
                 }
                 storeAcc(storageLocation);
             }
-            if (isNaN(parseInt(firstChild.value))) { // Variable
-                loadAccMem(getVariableKey(firstChild.value, scope));
-            } else { // Constant
-                loadAcc(parseInt(firstChild.value));
-            }
+            loadAcc(parseInt(firstChild.value));
             addWithCarry(storageLocation);
         }
         add(node);
@@ -170,7 +175,7 @@ var genPrint = function(node, scope) {
         var stringValue = value.substr(1, value.length - 2);
         var stringLocation = getStringLocation(stringValue, scope);
         loadXConstant(2);
-        loadYMem(stringLocation);
+        loadYConstant(intToHex(stringLocation));
     } else if (!isNaN(parseInt(value))) { // Number
         var num = parseInt(value);
         var key = getVariableKey(value, scope);
@@ -288,11 +293,77 @@ var genPrint = function(node, scope) {
 }
 
 var genIf = function(node, scope) {
-    // TODO
+    var child = node.children[0];
+    var firstChild = child.children[0];
+    var secondChild = child.children[1];
+    var sndKey;
+    if(isNaN(parseInt(firstChild.value))) { // variable
+        var fcKey = getVariableKey(firstChild.value, scope);
+        loadXMem(fcKey);
+    } else { // Constant
+        loadXConstant(parseInt(firstChild.value));
+    }
+    if(isNaN(parseInt(secondChild.value))) { // variable
+        sndKey = getVariableKey(secondChild.value, scope);
+    } else { // Constant
+        loadAcc(parseInt(secondChild.value));
+        sndKey = getVariableKey(secondChild.value, scope);
+        storeAcc(sndKey);
+    }
+    if(child.value === '=='){
+        compareXToMem(sndKey);
+        branchIfZFlag(CodeGen.jumpNum);
+        return CodeGen.code.length;
+    } else {
+        compareXToMem(sndKey);
+        loadXConstant(0);
+        branchIfZFlag(99);
+        CodeGen.jumpTable['J99'] = '2';
+        loadXConstant(1);
+        loadAcc(0);
+        var loc = getVariableKey(0, scope);
+        storeAcc(loc);
+        compareXToMem(loc);
+        branchIfZFlag(CodeGen.jumpNum);
+        return CodeGen.code.length;
+    }
 }
 
 var genWhile = function(node, scope) {
-    // TODO 
+    var child = node.children[0];
+    var firstChild = child.children[0];
+    var secondChild = child.children[1];
+    var sndKey;
+    if(isNaN(parseInt(firstChild.value))) { // variable
+        var fcKey = getVariableKey(firstChild.value, scope);
+        loadXMem(fcKey);
+    } else { // Constant
+        loadXConstant(parseInt(firstChild.value));
+    }
+    if(isNaN(parseInt(secondChild.value))) { // variable
+        sndKey = getVariableKey(secondChild.value, scope);
+    } else { // Constant
+        loadAcc(parseInt(secondChild.value));
+        sndKey = getVariableKey(secondChild.value, scope);
+        storeAcc(sndKey);
+    }
+    if(child.value === '=='){
+        compareXToMem(sndKey);
+        branchIfZFlag(CodeGen.jumpNum);
+        return CodeGen.code.length;
+    } else {
+        compareXToMem(sndKey);
+        loadXConstant(0);
+        branchIfZFlag(99);
+        CodeGen.jumpTable['J99'] = '2';
+        loadXConstant(1);
+        loadAcc(0);
+        var loc = getVariableKey(0, scope);
+        storeAcc(loc);
+        compareXToMem(loc);
+        branchIfZFlag(CodeGen.jumpNum);
+        return CodeGen.code.length;
+    }
 }
 
 
@@ -350,19 +421,18 @@ var getStringLocation = function (value, scope) {
 }
 
 var getVariableKey = function (name, scope) {
-    var num = scope.num;
     var newScope = scope;
+    var key = CodeGen.staticTable[name + newScope.num];
     while(key === undefined){
         newScope = newScope.parent;
-        var key = CodeGen.staticTable[name + newScope.num];
+        key = CodeGen.staticTable[name + newScope.num];
         if(newScope.parent === null){
             break;
         }
     }
-    var key = CodeGen.staticTable[name + num];
     if (key === undefined) {
-        assignVariableKey(name, num);
-        var key = CodeGen.staticTable[name + num];
+        assignVariableKey(name, scope.num);
+        key = CodeGen.staticTable[name + scope.num];
     }
     return key;
 }

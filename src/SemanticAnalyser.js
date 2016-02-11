@@ -187,11 +187,11 @@ getExprType = function(node){
             return null;
         }
     } else if(value.length === 1){
-        if(SemanticAnalyser.currentScope.vars[value] !== undefined){
-            SemanticAnalyser.currentScope.vars[value].used = true;
+        if(varTypeLookup(value) !== undefined){
+            // SemanticAnalyser.currentScope.vars[value].used = true;
             return varTypeLookup(value);
         } else {
-            Error.generateSemantic('Vareiable \'' + value + '\' is referenced out of scope');
+            Error.generateSemantic('Variable \'' + value + '\' is referenced out of scope');
             return null;
         }
     } else { 
@@ -200,7 +200,7 @@ getExprType = function(node){
     }
 }
 varTypeLookup = function(variable){
-    Logger.log('Retrieving type of \'' + variable + '\' from symbol table');   var scope = SemanticAnalyser.currentScope;
+    Logger.log('Retrieving type of \'' + variable + '\' from symbol table');
     var scope = SemanticAnalyser.currentScope;
     while (scope.vars[variable] === undefined){
         if ((scope.parent === null || scope.parent === undefined) || (Object.keys(scope.parent).length > 15)){
