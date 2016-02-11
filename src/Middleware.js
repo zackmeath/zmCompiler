@@ -41,7 +41,7 @@ $(document).ready(function() {
     compile.onclick = compileCode;
     cstButton.onclick = showCST;
     astButton.onclick = showAST;
-    compileCode(); // Comment this out to not compile on load
+    // compileCode(); // Comment this out to not compile on load
 });
 
 function compileCode() {
