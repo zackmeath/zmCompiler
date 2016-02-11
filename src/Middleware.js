@@ -17,20 +17,22 @@ function cbToggle(event){
 $(document).ready(function() {
     //input.linedtextarea();
     input.val(
-            // "{\n   int a\n   a = 1\n   int c\n   c = 2 + a\n   {\n      string a\n      a = \"a\"\n      print (a)\n   }\n   " + 
-            // "if (a == 1){\n      print (c)\n   }\n}$" + 
-            // "\n\n{\na = 1\n}$" + 
-            // "\n\n{\nint a\na = 1\n}$" +
-            // "\n\n{int a \na = 1 + 2 + 3}$" +
-            // "\n\n{}$" +
-            // "\n\n{print(1 + 2 + 3)}$" + 
-            // "\n\n{int a\nif(a == 1){print (9)}}$" + 
-            // "\n\n{string a\na = \"string\"\n{print (a)}}$" +
-            // "\n\n{int a\na = 1 + 2 + 3\n print(a)}$" +
-            "{\nstring a\na = \"abc\"\nprint(a)\n}$" +
-            "{if(1!=1){\nprint(8)}\n}$" +
-            "{\nint a\na=1\nwhile(a == 1){    a = 1 + a\n}\nprint(a)}$" +
-            "{\nint a\na=1\nwhile(a != 5){\n    print(a)\n    a = 1 + a\n}\nprint(\"done\")}$"
+            "{\n   int a\n   a = 1\n   int c\n   c = 2 + a\n   {\n      string a\n      a = \"a\"\n      print (a)\n   }\n   " + 
+            "if (a == 1){\n      print (c)\n   }\n}$" + 
+            "\n\n{\nin a\na = 1\n}$" +
+            "\n\n{int a \na = 1 + 2 + 3\nprint(b)}$" +
+            "\n\n{}$" +
+            "\n\n{print(1 + 2 + 3)}$" + 
+            "\n\n{int a\nif(a == 1){print (9)}}$" + 
+            "\n\n{string a\na = \"string\"\n{print (a)}}$" +
+            "\n\n{int a\na = 1 + 2 + 3\n print(a)}$" +
+            "\n\n{}$" +
+            "\n\n{a = 1}$" +
+            "\n\n{int a}$" +
+            "\n\n{\nstring a\na = \"abc\"\nprint(a)\n}$" +
+            "\n\n{if(1!=1){\nprint(8)}\n}$" +
+            "\n\n{\nint a\na=1\nwhile(a == 1){\n    a = 1 + a\n}\nprint(a)}$" +
+            "\n\n{\nint a\na=1\nwhile(a != 5){\n    print(a)\n    a = 1 + a\n}\nprint(\"done\")}$"
             );
     output.val('00');
     for (var i = 1; i < 256; i++){

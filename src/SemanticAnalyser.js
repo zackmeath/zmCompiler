@@ -150,6 +150,19 @@ SemanticAnalyser.check = function(node){
         } else {
             Logger.log('\tMatching types');
         }
+    } else if (node.value === 'print') {
+        var child = node.children[0];
+        if(child.value === '==' || child.value === '!='){
+            SemanticAnalyser.check(child);
+        } else {
+            if (!isNaN(parseInt(child.value))){
+                Logger.log('\tInteger constant');
+            } else if (child.value.charAt(0) === '\"'){
+                Logger.log('\tString constant');
+            } else {
+                var type = varTypeLookup(child.value);
+            }
+        }
     } else {
         node.children.forEach(function(child){
             SemanticAnalyser.check(child);
