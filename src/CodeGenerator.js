@@ -4,15 +4,16 @@ function CodeGen(){
 CodeGen.staticTable = {};
 CodeGen.jumpTable = {};
 
-CodeGen.generateCode = function(ast){
-
+CodeGen.generateCode = function(ast, symbolTable){
     // Reset CodeGen
+
     CodeGen.staticTable = {};                         // Table for variable location references
     CodeGen.jumpTable   = {};                         // Keeps track of jump distances
     CodeGen.code        = [];                         // Array of bytes that represent the code generated
     CodeGen.endBytes    = [];                         // Array of bytes to be appended at the end of the program
     CodeGen.jumpNum     = 0;                          // Tracks the current jump reference for jump table
     CodeGen.parentScope = SemanticAnalyser.lastScope; // References the outermost scope
+    CodeGen.symbolTable = symbolTable;
     CodeGen.variableKeyNumber = 0;
 
     Logger.warning('\nStarting Code Generation...');
@@ -38,11 +39,12 @@ CodeGen.backpatch = function(){
         if (backpatchTable[code] !== undefined){
             CodeGen.code[i] = backpatchTable[code];
         }
+
+        // While traversing, why not also fill in jump table values
         if (CodeGen.jumpTable[code] !== undefined){
             CodeGen.code[i] = intToHex(CodeGen.jumpTable[code]);
         }
     }
-    // While traversing, also fill in jump table values
 }
 
 var generateCode = function(ast){
@@ -128,7 +130,7 @@ var genAssignment = function(node, scope) {
     } else if (value === '+') { // Addition
         assignVariableKey('+', 0);
         var storageLocation = CodeGen.staticTable['+' + 0];
-        var add = function(node){
+        var add = function(node) {
             var firstChild = node.children[0];
             var secondChild = node.children[1];
             if(secondChild.value === '+'){
@@ -144,16 +146,16 @@ var genAssignment = function(node, scope) {
             }
             if (isNaN(parseInt(firstChild.value))) { // Variable
                 loadAccMem(getVariableKey(firstChild.value, scope));
-            } else { // Int
+            } else { // Constant
                 loadAcc(parseInt(firstChild.value));
             }
             addWithCarry(storageLocation);
         }
         add(node);
         storeAcc(key);
-    } else { // It is a variable assignment
-        var valueKey = getVariableKey(value, scope);
-        loadAccMem(valueKey);
+    } else { // variable assignment
+        var valueVarKey = getVariableKey(value, scope);
+        loadAccMem(valueVarKey);
         storeAcc(key);
     }
 }
@@ -168,7 +170,7 @@ var genPrint = function(node, scope) {
         loadYMem(stringLocation);
     } else if (!isNaN(parseInt(value))) { // Number
         var num = parseInt(value);
-        var key = getVariableKey('z', num);
+        var key = getVariableKey(value, scope);
         loadAcc(num);
         storeAcc(key);
         loadXConstant(1);
@@ -253,7 +255,7 @@ var genPrint = function(node, scope) {
                 }
                 storeAcc(storageLocation);
             }
-            if (isNaN(parseInt(firstChild.value))) { // Variable
+            if (isNaN(parseInt(firstChild.value))) { // Variable TODO Account for strings
                 loadAccMem(getVariableKey(firstChild.value, scope));
             } else { // Int
                 loadAcc(parseInt(firstChild.value));
@@ -270,8 +272,8 @@ var genPrint = function(node, scope) {
     } else if (value === 'true') { // Boolean Literal
         loadXConstant(1);
         loadYConstant(1);
-    } else { // Variable
-        console.log(scope);
+    } else { // Variable TODO Account for strings
+        // console.log(scope);
     }
     sysCall();
 }
@@ -305,31 +307,53 @@ var branchIfZFlag = function(jumpNum){
 }
 
 // Utilities
+var variableTypeLookup = function (name, scope) {
+    var info = CodeGen.symbolTable[scope.num + name];
+    while (info === undefined && scope !== null) {
+        info = CodeGen.symbolTable[scope.num + name];
+        scope = scope.parent;
+    }
+    if (info === undefined) { return undefined; }
+    return info.type;
+}
+
 var getStringLocation = function (value, scope) {
-    // TODO Account for variable reference in a sub-scope
+    var newScope = scope;
     var key = CodeGen.staticTable[value + scope.num];
-    if (key === undefined){
+    while(key === undefined){
+        newScope = newScope.parent;
+        var key = CodeGen.staticTable[value + newScope.num];
+        if(newScope.parent === null){
+            break;
+        }
+    }
+    if (key === undefined){ // Add the string to the end of the output
+        CodeGen.endBytes.unshift('00'); // 00 is the terminator for the string
         for (var i = 0; i < value.length; i++){
             var character = value[i];
             CodeGen.endBytes.unshift(characterToHex(character));
         }
         CodeGen.staticTable[value + scope.num] = 256 - CodeGen.endBytes.length;
-        console.log(CodeGen.staticTable[value + scope.num]);
+        // console.log(CodeGen.staticTable[value + scope.num]);
         key = CodeGen.staticTable[value + scope.num];
-        CodeGen.endBytes.unshift('00');
     }
     return key;
 }
+
 var getVariableKey = function (name, scope) {
-    var num = scope;
-    if (typeof scope === 'object'){
-        // TODO Account for variable reference in a sub-scope
-        num = scope.num;
+    var num = scope.num;
+    var newScope = scope;
+    while(key === undefined){
+        newScope = newScope.parent;
+        var key = CodeGen.staticTable[name + newScope.num];
+        if(newScope.parent === null){
+            break;
+        }
     }
-    var key = CodeGen.staticTable[name + scope.num];
+    var key = CodeGen.staticTable[name + num];
     if (key === undefined) {
-        assignVariableKey(name, scope.num);
-        var key = CodeGen.staticTable[name + scope.num];
+        assignVariableKey(name, num);
+        var key = CodeGen.staticTable[name + num];
     }
     return key;
 }

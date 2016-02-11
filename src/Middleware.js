@@ -31,6 +31,8 @@ $(document).ready(function() {
             "\n\n{}$" +
             "\n\n{print(1 + 2 + 3)}$" + 
             "\n\n{int a\nif(a == 1){print (9)}}$" + 
+            "\n\n{string a\na = \"string\"\n{print (a)}}$" +
+            "\n\n{int a\na = 1 + 2 + 3\n print(a)}$" +
             "\n\n{print((1 == 1))}$"
             );
     output.val('00');
@@ -139,7 +141,7 @@ function compileCodeBlock(inputProgram) {
     Logger.warning('Semantic Analysis successful!');
     outputObject.symbolTable = SemanticAnalyser.buildSymbolTable();
     Display.symbolTable(outputObject.symbolTable);
-    outputObject.generatedCode = CodeGen.generateCode(SemanticAnalyser.ast);
+    outputObject.generatedCode = CodeGen.generateCode(SemanticAnalyser.ast, SemanticAnalyser.symbolTable);
     if (Error.codeGenErrors > 0){
         outputObject.success = false;
         outputObject.failedOn = "Code Generation";
