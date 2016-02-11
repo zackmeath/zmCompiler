@@ -16,24 +16,18 @@ function cbToggle(event){
 
 $(document).ready(function() {
     //input.linedtextarea();
-    //input.val("{\n   int a\n   a = 5\n}\n$");
-    //input.val("{intff=0intif=5}$");
-    // input.val("{\nstring a\na = \"t s\"\n}$");
-    // input.val("{\n    int a\n    a = 3\n    while (a == 3) {\n        " +
-    // 	"print(1 + 2 + 3 + 4 + 5)\n        a = 1 + a\n    }\n    " + 
-    // 	"print((true == true))\n    print((false == false))\n} $");
-    // input.val('{\n   int a\n   a = 4\n}$');
-    input.val("{\n   int a\n   a = 1\n   int c\n   c = 2 + a\n   {\n      string a\n      a = \"a\"\n      print (a)\n   }\n   " + 
-            "if (a == 1){\n      print (c)\n   }\n}$" + 
-            "\n\n{\na = 1\n}$" + 
-            "\n\n{\nint a\na = 1\n}$" +
-            "\n\n{int a \na = 1 + 2 + 3}$" +
-            "\n\n{}$" +
-            "\n\n{print(1 + 2 + 3)}$" + 
-            "\n\n{int a\nif(a == 1){print (9)}}$" + 
-            "\n\n{string a\na = \"string\"\n{print (a)}}$" +
-            "\n\n{int a\na = 1 + 2 + 3\n print(a)}$" +
-            "\n\n{print((1 == 1))}$"
+    input.val(
+            // "{\n   int a\n   a = 1\n   int c\n   c = 2 + a\n   {\n      string a\n      a = \"a\"\n      print (a)\n   }\n   " + 
+            // "if (a == 1){\n      print (c)\n   }\n}$" + 
+            // "\n\n{\na = 1\n}$" + 
+            // "\n\n{\nint a\na = 1\n}$" +
+            // "\n\n{int a \na = 1 + 2 + 3}$" +
+            // "\n\n{}$" +
+            // "\n\n{print(1 + 2 + 3)}$" + 
+            // "\n\n{int a\nif(a == 1){print (9)}}$" + 
+            // "\n\n{string a\na = \"string\"\n{print (a)}}$" +
+            // "\n\n{int a\na = 1 + 2 + 3\n print(a)}$" +
+            "{\nstring a\na = \"abc\"\nprint(a)\n}$"
             );
     output.val('00');
     for (var i = 1; i < 256; i++){

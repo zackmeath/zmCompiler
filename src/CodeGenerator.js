@@ -25,6 +25,7 @@ CodeGen.generateCode = function(ast, symbolTable){
 }
 
 CodeGen.backpatch = function(){
+    console.log(CodeGen.staticTable);
     // Create variable references via the static table to allow a location for each variable
     var backpatchTable = {};
     var nextPosition = CodeGen.code.length + 1;
@@ -111,6 +112,7 @@ var generateCode = function(ast){
 }
 
 var genVarDecl = function(node, scope) {
+    var type = variableTypeLookup(node.children[1].value, scope);
     var key = getVariableKey(node.children[1].value, scope);
     loadAcc(0);
     storeAcc(key);
@@ -125,7 +127,8 @@ var genAssignment = function(node, scope) {
     } else if (value.substr(0,1) === '\"') { // String constant
         var stringValue = value.substr(1, value.length - 2);
         var stringLocation = getStringLocation(stringValue, scope);
-        loadAcc(stringLocation);
+        console.log(stringLocation);
+        loadAcc(intToHex(stringLocation));
         storeAcc(key);
     } else if (value === '+') { // Addition
         assignVariableKey('+', 0);
@@ -255,7 +258,7 @@ var genPrint = function(node, scope) {
                 }
                 storeAcc(storageLocation);
             }
-            if (isNaN(parseInt(firstChild.value))) { // Variable TODO Account for strings
+            if (isNaN(parseInt(firstChild.value))) { // Variable
                 loadAccMem(getVariableKey(firstChild.value, scope));
             } else { // Int
                 loadAcc(parseInt(firstChild.value));
@@ -272,8 +275,14 @@ var genPrint = function(node, scope) {
     } else if (value === 'true') { // Boolean Literal
         loadXConstant(1);
         loadYConstant(1);
-    } else { // Variable TODO Account for strings
-        // console.log(scope);
+    } else { // Variable
+        var type = variableTypeLookup(value, scope);
+        if (type === 'int'){
+            loadXConstant(1);
+        } else { // string
+            loadXConstant(2);
+        }
+        loadYMem(getVariableKey(value, scope));
     }
     sysCall();
 }
@@ -329,13 +338,13 @@ var getStringLocation = function (value, scope) {
     }
     if (key === undefined){ // Add the string to the end of the output
         CodeGen.endBytes.unshift('00'); // 00 is the terminator for the string
-        for (var i = 0; i < value.length; i++){
+        for (var i = value.length-1; i >= 0; i--){
             var character = value[i];
             CodeGen.endBytes.unshift(characterToHex(character));
         }
-        CodeGen.staticTable[value + scope.num] = 256 - CodeGen.endBytes.length;
+        key = 256 - CodeGen.endBytes.length;
+        // CodeGen.staticTable[value + scope.num] = 256 - CodeGen.endBytes.length;
         // console.log(CodeGen.staticTable[value + scope.num]);
-        key = CodeGen.staticTable[value + scope.num];
     }
     return key;
 }
@@ -375,7 +384,7 @@ var constCommand = function(cmd, constant){
     CodeGen.code.push(hexToByte(add));
 }
 var characterToHex = function(character){
-    return character.charCodeAt(0) + '';
+    return intToHex(character.charCodeAt(0)) + '';
 }
 var hexToByte = function(hex){
     if (hex.length === 1){
