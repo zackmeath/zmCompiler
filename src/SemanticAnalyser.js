@@ -159,6 +159,8 @@ SemanticAnalyser.check = function(node){
                 Logger.log('\tInteger constant');
             } else if (child.value.charAt(0) === '\"'){
                 Logger.log('\tString constant');
+            } else if(child.value.length > 1){
+                Logger.log('\tBoolean constant');
             } else {
                 var type = varTypeLookup(child.value);
             }

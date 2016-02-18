@@ -25,6 +25,7 @@ CodeGen.generateCode = function(ast, symbolTable){
 }
 
 CodeGen.backpatch = function(){
+    console.log(CodeGen.staticTable);
     // Create variable references via the static table to allow a location for each variable
     var backpatchTable = {};
     var nextPosition = CodeGen.code.length + 1;
@@ -49,8 +50,8 @@ CodeGen.backpatch = function(){
 
 var generateCode = function(ast){
 
-    var scopeRoot    = {num: 0, parent: null, children: []};
-    var nextScope    = 1;
+    var scopeRoot    = null;
+    var nextScope    = 0;
     var currentScope = scopeRoot;
 
     var evaluateNode = function(node){
@@ -65,8 +66,14 @@ var generateCode = function(ast){
 
         if (node.value === '{}'){
             exitScope = true;
-            currentScope.children.push({num: nextScope++, parent: currentScope, children:[]});
-            currentScope = currentScope.children[currentScope.children.length - 1];
+            if (scopeRoot === null){
+                scopeRoot = { num:0, parent:null, children:[] };
+                currentScope = scopeRoot;
+                nextScope++;
+            } else {
+                currentScope.children.push({num: nextScope++, parent: currentScope, children:[]});
+                currentScope = currentScope.children[currentScope.children.length - 1];
+            }
         } else if(node.value === '='){
             genAssignment(node, currentScope);
         } else if (node.value === 'print'){
@@ -121,8 +128,8 @@ var generateCode = function(ast){
 }
 
 var genVarDecl = function(node, scope) {
-    var type = variableTypeLookup(node.children[1].value, scope);
-    var key = getVariableKey(node.children[1].value, scope);
+    var type = variableTypeLookup(node.children[1].value, scope, false);
+    var key = getVariableKey(node.children[1].value, scope, false);
     loadAcc(0);
     storeAcc(key);
 }
@@ -160,6 +167,13 @@ var genAssignment = function(node, scope) {
             addWithCarry(storageLocation);
         }
         add(node);
+        storeAcc(key);
+    } else if (value.length > 1) { // Boolean literal
+        var val = 0;
+        if (value === 'true'){
+            val = 1;
+        }
+        loadAcc(val);
         storeAcc(key);
     } else { // variable assignment
         var valueVarKey = getVariableKey(value, scope);
@@ -282,7 +296,7 @@ var genPrint = function(node, scope) {
         loadYConstant(1);
     } else { // Variable
         var type = variableTypeLookup(value, scope);
-        if (type === 'int'){
+        if (type === 'int' || type === 'boolean'){
             loadXConstant(1);
         } else { // string
             loadXConstant(2);
@@ -387,9 +401,12 @@ var branchIfZFlag = function(jumpNum){
 }
 
 // Utilities
-var variableTypeLookup = function (name, scope) {
+var variableTypeLookup = function (name, scope, lookInPreviousScopes) {
+    if(lookInPreviousScopes === undefined){
+        lookInPreviousScopes = true;
+    }
     var info = CodeGen.symbolTable[scope.num + name];
-    while (info === undefined && scope !== null) {
+    while ((info === undefined && scope !== null) && lookInPreviousScopes) {
         info = CodeGen.symbolTable[scope.num + name];
         scope = scope.parent;
     }
@@ -397,15 +414,15 @@ var variableTypeLookup = function (name, scope) {
     return info.type;
 }
 
-var getStringLocation = function (value, scope) {
+var getStringLocation = function (value, scope, lookInPreviousScopes) {
+    if (lookInPreviousScopes == undefined){
+        lookInPreviousScopes = true;
+    }
     var newScope = scope;
     var key = CodeGen.staticTable[value + scope.num];
-    while(key === undefined){
+    while(newScope.parent !== null && key === undefined && lookInPreviousScopes){
         newScope = newScope.parent;
         var key = CodeGen.staticTable[value + newScope.num];
-        if(newScope.parent === null){
-            break;
-        }
     }
     if (key === undefined){ // Add the string to the end of the output
         CodeGen.endBytes.unshift('00'); // 00 is the terminator for the string
@@ -420,15 +437,15 @@ var getStringLocation = function (value, scope) {
     return key;
 }
 
-var getVariableKey = function (name, scope) {
+var getVariableKey = function (name, scope, lookInPreviousScopes) {
+    if (lookInPreviousScopes === undefined) {
+        lookInPreviousScopes = true;
+    }
     var newScope = scope;
     var key = CodeGen.staticTable[name + newScope.num];
-    while(key === undefined){
+    while(lookInPreviousScopes && (key === undefined && newScope.parent !== null)){
         newScope = newScope.parent;
         key = CodeGen.staticTable[name + newScope.num];
-        if(newScope.parent === null){
-            break;
-        }
     }
     if (key === undefined) {
         assignVariableKey(name, scope.num);

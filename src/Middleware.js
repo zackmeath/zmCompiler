@@ -34,6 +34,14 @@ $(document).ready(function() {
             "\n\n{\nint a\na=1\nwhile(a == 1){\n    a = 1 + a\n}\nprint(a)}$" +
             "\n\n{\nint a\na=1\nwhile(a != 5){\n    print(a)\n    a = 1 + a\n}\nprint(\"done\")}$"
             );
+
+//     input.val(
+//             "{\nboolean a\na = true\nprint(a)\na = false\nprint(a)\n}$\n" + 
+//             "\n{\nprint(true)\nprint(false)\n}$\n" + 
+//             "\n{print(false == true)}$" + 
+//             "\n{\nint x\nx = 7\n{\n   int x\n   x = 0\n   print(x)\n   print(x)\n}\nprint(x)\n}\n$"
+//             )
+
     output.val('00');
     for (var i = 1; i < 256; i++){
         output.val(output.val() + ' 00');
