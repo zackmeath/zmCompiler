@@ -17,22 +17,21 @@ function cbToggle(event){
 $(document).ready(function() {
     //input.linedtextarea();
     input.val(
-            "{\n   int a\n   a = 1\n   int c\n   c = 2 + a\n   {\n      string a\n      a = \"a\"\n      print (a)\n   }\n   " + 
-            "if (a == 1){\n      print (c)\n   }\n}$" + 
-            "\n\n{\nin a\na = 1\n}$" +
-            "\n\n{int a \na = 1 + 2 + 3\nprint(b)}$" +
-            "\n\n{}$" +
-            "\n\n{print(1 + 2 + 3)}$" + 
-            "\n\n{int a\nif(a == 1){print (9)}}$" + 
-            "\n\n{string a\na = \"string\"\n{print (a)}}$" +
-            "\n\n{int a\na = 1 + 2 + 3\n print(a)}$" +
-            "\n\n{}$" +
+            "{}$" +
             "\n\n{a = 1}$" +
             "\n\n{int a}$" +
-            "\n\n{\nstring a\na = \"abc\"\nprint(a)\n}$" +
-            "\n\n{if(1!=1){\nprint(8)}\n}$" +
-            "\n\n{\nint a\na=1\nwhile(a == 1){\n    a = 1 + a\n}\nprint(a)}$" +
-            "\n\n{\nint a\na=1\nwhile(a != 5){\n    print(a)\n    a = 1 + a\n}\nprint(\"done\")}$"
+            "\n\n{print(1 + 2 + 3)}$" + 
+            "\n\n{\n  in a\n  a = 1\n}$" +
+            "\n\n{\n  int a\n  a = 1 + 2 + 3\n  print(a)\n}$" +
+            "\n\n{\n  int a\n  a = 1 + 2 + 3\n  print(b)\n}$" +
+            "\n\n{\n  string a\n  a = \"string\"\n  {print (a)}}$" +
+            "\n\n{\n  int a\n  if(a == 1){\n    print (9)\n  }\n}$" + 
+            "\n\n{\n  int a\n  a = 1\n  int c\n  c = 2 + a\n  {\n    string a\n    a = \"a\"\n    print (a)\n  }\n  " + 
+                    "if (a == 1){\n    print (c)\n  }\n}$" + 
+            "\n\n{\n  string a\n  a = \"abc\"\n  print(a)\n}$" +
+            "\n\n{\n  if(1 != 1){\n    print(8)\n  }\n}$" +
+            "\n\n{\n  int a\n  a=1\n  while(a == 1){\n    a = 1 + a\n  }\n  print(a)\n}$" +
+            "\n\n{\n  int a\n  a=1\n  while(a != 5){\n    print(a)\n    a = 1 + a\n  }\n  print(\"done\")\n}$"
             );
 
 //     input.val(
@@ -79,11 +78,12 @@ function compileCode() {
     for(var i = 0; i < compiledPrograms.length; i++){
         var program = compiledPrograms[i];
         buttonType = program.success ? 'success' : 'danger';
-        var button = '<button id=\"Program' + i + '\" type=\"button\" class=\"btn btn-xs btn-' + buttonType + '\">Program #' + i + '</button>';
+        var button = '<button id=\"Program' + i + '\" type=\"button\" class=\"btn btn-xs btn-' + buttonType + '\">Program #' + (i + 1) + '</button>';
         programButtons.append(button);
         $("#Program" + i).on('click', function(e){
             currentIndex = parseInt(this.id.substr(7));
             var programObject = compiledPrograms[currentIndex];
+            input.val(programObject.input.trim());
             tokenOut.val(programObject.log);
             output.val(programObject.generatedCode);
             $('#tree1').tree('destroy');

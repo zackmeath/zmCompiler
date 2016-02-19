@@ -152,7 +152,7 @@ SemanticAnalyser.check = function(node){
         }
     } else if (node.value === 'print') {
         var child = node.children[0];
-        if(child.value === '==' || child.value === '!='){
+        if(child.value === '+' || child.value === '==' || child.value === '!='){
             SemanticAnalyser.check(child);
         } else {
             if (!isNaN(parseInt(child.value))){

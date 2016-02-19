@@ -25,7 +25,6 @@ CodeGen.generateCode = function(ast, symbolTable){
 }
 
 CodeGen.backpatch = function(){
-    console.log(CodeGen.staticTable);
     // Create variable references via the static table to allow a location for each variable
     var backpatchTable = {};
     var nextPosition = CodeGen.code.length + 1;
